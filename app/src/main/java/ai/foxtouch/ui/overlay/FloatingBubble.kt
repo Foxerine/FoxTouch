@@ -34,6 +34,8 @@ import ai.foxtouch.agent.ApprovalResponse
 import ai.foxtouch.agent.CompletionResponse
 import ai.foxtouch.agent.PlanApprovalResponse
 import ai.foxtouch.data.db.entity.TaskEntity
+import ai.foxtouch.data.preferences.AgentMode
+import ai.foxtouch.data.preferences.AppSettings
 import ai.foxtouch.ui.screens.chat.TaskProgress
 import ai.foxtouch.di.ApplicationScope
 import ai.foxtouch.ui.theme.FoxTouchTheme
@@ -54,6 +56,7 @@ import javax.inject.Inject
 class FloatingBubbleService : Service() {
 
     @Inject lateinit var agentRunner: AgentRunner
+    @Inject lateinit var appSettings: AppSettings
     @Inject @ApplicationScope lateinit var applicationScope: CoroutineScope
 
     private var windowManager: WindowManager? = null
@@ -121,10 +124,16 @@ class FloatingBubbleService : Service() {
             agentRunner.state.collect { state ->
                 when (state) {
                     is AgentState.WaitingApproval,
-                    is AgentState.PlanReview,
-                    is AgentState.ConfirmingCompletion -> mainHandler.post {
+                    is AgentState.PlanReview -> mainHandler.post {
                         isExpanded = true
                         updateFocusability(false)
+                        if (!FoxTouchApp.ForegroundTracker.isForeground.value) {
+                            showPanel()
+                        }
+                    }
+                    is AgentState.ConfirmingCompletion -> mainHandler.post {
+                        isExpanded = true
+                        updateFocusability(true)
                         if (!FoxTouchApp.ForegroundTracker.isForeground.value) {
                             showPanel()
                         }
@@ -251,6 +260,7 @@ class FloatingBubbleService : Service() {
                 FoxTouchTheme {
                     val state by agentRunner.state.collectAsState()
                     val isBusy by agentRunner.isBusy.collectAsState()
+                    val agentMode by appSettings.agentMode.collectAsState(initial = AgentMode.NORMAL)
                     val tasks by agentRunner.sessionTasks.collectAsState()
                     val taskProgress = remember(tasks) {
                         TaskProgress(
@@ -265,10 +275,19 @@ class FloatingBubbleService : Service() {
                     OverlayBar(
                         state = state,
                         isBusy = isBusy,
+                        agentMode = agentMode,
                         isExpanded = isExpanded,
                         lastMessage = lastMessage,
                         tasks = tasks,
                         taskProgress = taskProgress,
+                        onCycleAgentMode = {
+                            val next = when (agentMode) {
+                                AgentMode.NORMAL -> AgentMode.PLAN
+                                AgentMode.PLAN -> AgentMode.YOLO
+                                AgentMode.YOLO -> AgentMode.NORMAL
+                            }
+                            applicationScope.launch { appSettings.setAgentMode(next) }
+                        },
                         onToggleExpand = {
                             isExpanded = !isExpanded
                             if (!isExpanded) updateFocusability(false)

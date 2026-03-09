@@ -35,12 +35,14 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import ai.foxtouch.tools.ToolDisplayRegistry
+import ai.foxtouch.ui.components.FullScreenImageViewer
 import ai.foxtouch.ui.components.ScreenPreview
 import ai.foxtouch.ui.screens.chat.ChatUiMessage
 
 @Composable
 fun ToolCallCard(message: ChatUiMessage, showJsonMode: Boolean = false, isDebugMode: Boolean = false) {
     var expanded by remember { mutableStateOf(false) }
+    var showFullscreenImage by remember { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
     val toolName = message.toolName ?: "tool"
 
@@ -179,22 +181,27 @@ fun ToolCallCard(message: ChatUiMessage, showJsonMode: Boolean = false, isDebugM
                         Spacer(Modifier.height(4.dp))
                         ScreenPreview(
                             base64Image = screenshotBase64,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showFullscreenImage = true },
                         )
                         Spacer(Modifier.height(4.dp))
                     } else {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable { showFullscreenImage = true },
+                        ) {
                             Icon(
                                 Icons.Default.Image,
                                 contentDescription = null,
                                 modifier = Modifier.size(14.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                             Spacer(Modifier.width(4.dp))
                             Text(
                                 text = "captured screenshot (${screenshotBase64.length / 1024}KB)",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = MaterialTheme.colorScheme.primary,
                             )
                         }
                         Spacer(Modifier.height(4.dp))
@@ -214,6 +221,13 @@ fun ToolCallCard(message: ChatUiMessage, showJsonMode: Boolean = false, isDebugM
                 )
             }
         }
+    }
+
+    if (showFullscreenImage && screenshotBase64 != null) {
+        FullScreenImageViewer(
+            base64Image = screenshotBase64,
+            onDismiss = { showFullscreenImage = false },
+        )
     }
 }
 

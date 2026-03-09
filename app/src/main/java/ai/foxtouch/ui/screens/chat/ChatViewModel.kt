@@ -20,7 +20,8 @@ import ai.foxtouch.data.repository.MessageRepository
 import ai.foxtouch.data.repository.SessionRepository
 import ai.foxtouch.data.repository.TaskRepository
 import ai.foxtouch.tools.BackTool
-import ai.foxtouch.tools.ClickTool
+import ai.foxtouch.tools.ClickElementTool
+import ai.foxtouch.tools.TapTool
 import ai.foxtouch.tools.CreateTaskTool
 import ai.foxtouch.tools.HomeTool
 import ai.foxtouch.tools.LaunchAppTool
@@ -30,6 +31,8 @@ import ai.foxtouch.tools.ReadScreenTool
 import ai.foxtouch.tools.ScrollTool
 import ai.foxtouch.tools.SwipeTool
 import ai.foxtouch.tools.ToolRegistry
+import ai.foxtouch.tools.ClipboardTool
+import ai.foxtouch.tools.TypeAtTool
 import ai.foxtouch.tools.TypeTextTool
 import ai.foxtouch.tools.UpdateTaskTool
 import ai.foxtouch.tools.ListAppsTool
@@ -142,6 +145,9 @@ class ChatViewModel @Inject constructor(
     private val _logs = MutableStateFlow<List<LogEntry>>(emptyList())
     val logs: StateFlow<List<LogEntry>> = _logs.asStateFlow()
 
+    private val _sessionSizes = MutableStateFlow<Map<String, Long>>(emptyMap())
+    val sessionSizes: StateFlow<Map<String, Long>> = _sessionSizes.asStateFlow()
+
     val taskProgress: StateFlow<TaskProgress> = _sessionTasks
         .map { tasks ->
             TaskProgress(
@@ -163,11 +169,20 @@ class ChatViewModel @Inject constructor(
 
     init {
         registerTools()
-        viewModelScope.launch { startNewSession() }
+        viewModelScope.launch {
+            // If the agent is currently busy with a session, resume it instead of creating new
+            val activeSessionId = agentRunner.currentSessionId
+            if (agentRunner.isBusy.value && activeSessionId != null) {
+                switchSession(activeSessionId)
+            } else {
+                startNewSession()
+            }
+        }
         collectVoiceResults()
         collectAgentOutputs()
         collectAgentBusy()
         collectAgentLogs()
+        refreshSessionSizes()
         collectPlanReviewState()
         collectAskUserState()
         collectCompletionState()
@@ -185,8 +200,11 @@ class ChatViewModel @Inject constructor(
     private fun registerTools() {
         toolRegistry.registerAll(
             ReadScreenTool(appSettings),
-            ClickTool(appSettings),
-            TypeTextTool(),
+            ClickElementTool(appSettings),
+            TapTool(appSettings),
+            TypeTextTool(appSettings),
+            TypeAtTool(appSettings),
+            ClipboardTool(),
             ScrollTool(),
             SwipeTool(),
             LongPressTool(),
@@ -220,7 +238,7 @@ class ChatViewModel @Inject constructor(
                 awaitApproval = { agentRunner.planApprovalChannel.receive() },
                 onApproved = { yolo, saveAsSkill ->
                     agentRunner.setPendingModeSwitch(
-                        if (yolo) AgentMode.YOLO else AgentMode.NORMAL,
+                        if (yolo) AgentMode.YOLO else agentRunner.getPrePlanMode(),
                     )
                     if (saveAsSkill) {
                         val planContent = agentRunner.readPlanFile()
@@ -289,6 +307,16 @@ class ChatViewModel @Inject constructor(
 
     fun clearLogs() {
         _logs.value = emptyList()
+    }
+
+    private fun refreshSessionSizes() {
+        viewModelScope.launch {
+            val sessions = allSessions.value
+            val sizes = sessions.associate { session ->
+                session.id to messageRepository.getScreenshotSizeBySession(session.id)
+            }
+            _sessionSizes.value = sizes
+        }
     }
 
     private fun collectAgentBusy() {
@@ -431,12 +459,16 @@ class ChatViewModel @Inject constructor(
                         kotlinx.serialization.json.Json.parseToJsonElement(json) as? JsonObject
                     } catch (_: Exception) { null }
                 }
+                val imageBase64 = entity.screenshotPath?.let { path ->
+                    messageRepository.loadScreenshotBase64(path)
+                }
                 ChatUiMessage(
                     id = entity.id,
                     role = entity.role,
                     content = entity.toolResultJson ?: entity.content,
                     toolName = entity.toolName,
                     toolArgs = toolArgs,
+                    imageBase64 = imageBase64,
                 )
             }
             _uiState.value = _uiState.value.copy(
@@ -449,10 +481,12 @@ class ChatViewModel @Inject constructor(
 
     fun deleteSession(sessionId: String) {
         viewModelScope.launch {
+            messageRepository.deleteScreenshotsBySession(sessionId)
             sessionRepository.delete(sessionId)
             if (sessionId == _uiState.value.currentSessionId) {
                 clearChat()
             }
+            refreshSessionSizes()
         }
     }
 
@@ -461,6 +495,10 @@ class ChatViewModel @Inject constructor(
             agentRunner.cancelCurrentTurn()
             agentRunner.clearHistory()
             val currentId = _uiState.value.currentSessionId
+            // Delete screenshots for all sessions
+            allSessions.value.forEach { session ->
+                messageRepository.deleteScreenshotsBySession(session.id)
+            }
             if (currentId != null) {
                 // Delete all other sessions, clear current session content
                 sessionRepository.deleteAllExcept(currentId)
@@ -472,6 +510,7 @@ class ChatViewModel @Inject constructor(
             }
             _uiState.value = _uiState.value.copy(messages = emptyList(), error = null)
             isFirstMessage.set(true)
+            refreshSessionSizes()
         }
     }
 
@@ -562,12 +601,17 @@ class ChatViewModel @Inject constructor(
                     messages = _uiState.value.messages + msg,
                 )
                 if (sessionId != null) {
+                    val screenshotPath = output.imageBase64?.let { base64 ->
+                        messageRepository.saveScreenshot(msg.id, base64)
+                    }
                     messageRepository.addToolMessage(
                         sessionId = sessionId,
                         toolName = output.toolName,
                         argsJson = output.args.toString(),
                         resultJson = output.result,
+                        screenshotPath = screenshotPath,
                     )
+                    if (screenshotPath != null) refreshSessionSizes()
                 }
             }
             is AgentOutput.Error -> {

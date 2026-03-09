@@ -16,8 +16,11 @@ data class ToolPermissionConfig(
 
 val DEFAULT_TOOL_PERMISSIONS = listOf(
     ToolPermissionConfig("read_screen", RiskLevel.LOW, PermissionPolicy.ALWAYS_ALLOW),
-    ToolPermissionConfig("click", RiskLevel.HIGH, PermissionPolicy.ASK_EACH_TIME),
+    ToolPermissionConfig("click_element", RiskLevel.HIGH, PermissionPolicy.ASK_EACH_TIME),
+    ToolPermissionConfig("tap", RiskLevel.HIGH, PermissionPolicy.ASK_EACH_TIME),
     ToolPermissionConfig("type_text", RiskLevel.HIGH, PermissionPolicy.ASK_EACH_TIME),
+    ToolPermissionConfig("type_at", RiskLevel.HIGH, PermissionPolicy.ASK_EACH_TIME),
+    ToolPermissionConfig("clipboard", RiskLevel.MEDIUM, PermissionPolicy.ASK_EACH_TIME),
     ToolPermissionConfig("scroll", RiskLevel.MEDIUM, PermissionPolicy.ASK_EACH_TIME),
     ToolPermissionConfig("swipe", RiskLevel.MEDIUM, PermissionPolicy.ASK_EACH_TIME),
     ToolPermissionConfig("long_press", RiskLevel.HIGH, PermissionPolicy.ASK_EACH_TIME),

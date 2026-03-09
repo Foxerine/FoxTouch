@@ -118,6 +118,7 @@ fun ChatScreen(
     val isTtsEnabled by viewModel.isTtsEnabled.collectAsState()
     val recognitionState by viewModel.recognitionState.collectAsState()
     val sessions by viewModel.allSessions.collectAsState()
+    val sessionSizes by viewModel.sessionSizes.collectAsState()
     val sessionTasks by viewModel.sessionTasks.collectAsState()
     val taskProgress by viewModel.taskProgress.collectAsState()
     val logs by viewModel.logs.collectAsState()
@@ -229,6 +230,7 @@ fun ChatScreen(
         drawerContent = {
             SessionDrawer(
                 sessions = sessions,
+                sessionSizes = sessionSizes,
                 currentSessionId = uiState.currentSessionId,
                 onSessionSelected = { sessionId ->
                     viewModel.switchSession(sessionId)
@@ -415,6 +417,7 @@ private fun EmptyState(onSuggestionClick: (String) -> Unit) {
 @Composable
 private fun SessionDrawer(
     sessions: List<SessionEntity>,
+    sessionSizes: Map<String, Long>,
     currentSessionId: String?,
     onSessionSelected: (String) -> Unit,
     onNewSession: () -> Unit,
@@ -511,8 +514,10 @@ private fun SessionDrawer(
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
+                            val sizeBytes = sessionSizes[session.id] ?: 0L
+                            val sizeText = if (sizeBytes > 0) " · ${formatFileSize(sizeBytes)}" else ""
                             Text(
-                                text = "${session.provider} / ${session.model}",
+                                text = "${session.provider} / ${session.model}$sizeText",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -530,6 +535,12 @@ private fun SessionDrawer(
             }
         }
     }
+}
+
+private fun formatFileSize(bytes: Long): String = when {
+    bytes < 1024 -> "$bytes B"
+    bytes < 1024 * 1024 -> "${bytes / 1024} KB"
+    else -> String.format("%.1f MB", bytes / (1024.0 * 1024.0))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

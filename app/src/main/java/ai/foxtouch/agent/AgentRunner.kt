@@ -120,7 +120,7 @@ class AgentRunner @Inject constructor(
 
         /** Tools that physically interact with the screen — overlay must hide during execution. */
         private val INTERACTION_TOOL_NAMES = setOf(
-            "click", "type_text", "long_press", "scroll", "swipe", "pinch",
+            "click_element", "tap", "type_text", "type_at", "long_press", "scroll", "swipe", "pinch",
             "back", "home",
         )
     }
@@ -139,10 +139,11 @@ class AgentRunner @Inject constructor(
     private val _isBusy = MutableStateFlow(false)
     val isBusy: StateFlow<Boolean> = _isBusy.asStateFlow()
 
-    private val _logFlow = MutableSharedFlow<LogEntry>(extraBufferCapacity = 256)
+    private val _logFlow = MutableSharedFlow<LogEntry>(replay = 256, extraBufferCapacity = 64)
     val logFlow: SharedFlow<LogEntry> = _logFlow.asSharedFlow()
 
     private val _currentSessionId = MutableStateFlow<String?>(null)
+    val currentSessionId: String? get() = _currentSessionId.value
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
     val sessionTasks: StateFlow<List<TaskEntity>> = _currentSessionId
@@ -351,6 +352,10 @@ class AgentRunner @Inject constructor(
     @Volatile
     private var pendingPlanModeEntry: Boolean = false
 
+    /** The mode that was active before entering plan mode, so we can restore it on exit. */
+    @Volatile
+    private var prePlanMode: AgentMode? = null
+
     fun requestPlanModeEntry() {
         pendingPlanModeEntry = true
     }
@@ -365,6 +370,9 @@ class AgentRunner @Inject constructor(
     fun setPendingModeSwitch(mode: AgentMode) {
         pendingModeSwitch = mode
     }
+
+    /** Returns the mode that was active before entering plan mode. */
+    fun getPrePlanMode(): AgentMode = prePlanMode ?: AgentMode.NORMAL
 
     fun startTurn(userMessage: String, isPlanMode: Boolean = false) {
         applicationScope.launch {
@@ -534,6 +542,7 @@ class AgentRunner @Inject constructor(
 
             // Execute each tool call
             var pendingScreenshot: String? = null
+            var taskConfirmedThisTurn = false
 
             for (call in calls) {
                 val displayText = ToolDisplayRegistry.formatArgs(call.name, call.arguments)
@@ -562,7 +571,7 @@ class AgentRunner @Inject constructor(
                         PermissionPolicy.ASK_EACH_TIME -> {
                             _state.value = AgentState.WaitingApproval(call.name, call.arguments, call.id)
                             // Show highlight on target element for click tool
-                            if (call.name == "click") {
+                            if (call.name == "click_element" || call.name == "tap") {
                                 showClickHighlight(call.arguments)
                             }
                             agentLog("Waiting for approval: ${call.name}")
@@ -574,6 +583,7 @@ class AgentRunner @Inject constructor(
                                 ApprovalResponse.DENY -> false
                                 ApprovalResponse.ALWAYS_ALLOW -> {
                                     toolRegistry.setPermissionPolicy(call.name, PermissionPolicy.ALWAYS_ALLOW)
+                                    agentLog("Set ${call.name} to ALWAYS_ALLOW", LogLevel.INFO)
                                     true
                                 }
                                 ApprovalResponse.ALLOW_ALL -> {
@@ -617,6 +627,11 @@ class AgentRunner @Inject constructor(
                 conversationHistory.add(ChatMessage(role = "tool", content = result.text, toolCallId = call.id, toolName = call.name))
                 onOutput(AgentOutput.ToolExecution(call.name, call.arguments, result.text, result.imageBase64))
 
+                // Track user-confirmed completion
+                if (call.name == "confirm_completion" && result.text.startsWith("TASK_COMPLETE")) {
+                    taskConfirmedThisTurn = true
+                }
+
                 // Collect screenshot for injection as user message (images can only be user messages)
                 if (result.imageBase64 != null) {
                     pendingScreenshot = result.imageBase64
@@ -634,10 +649,21 @@ class AgentRunner @Inject constructor(
                 agentLog("Injected screenshot as user message")
             }
 
+            // Stop immediately when user confirms task completion —
+            // don't give the LLM another turn to generate more actions.
+            if (taskConfirmedThisTurn) {
+                agentLog("User confirmed completion — stopping", LogLevel.INFO)
+                _state.value = AgentState.Idle
+                return
+            }
+
             // Check if AI proactively entered plan mode
             if (pendingPlanModeEntry) {
                 pendingPlanModeEntry = false
                 effectivePlanMode = true
+                prePlanMode = mode
+                mode = AgentMode.PLAN
+                appSettings.setAgentMode(AgentMode.PLAN)
                 agentLog("AI entered plan mode proactively, restricting to read-only + plan tools", LogLevel.INFO)
             }
 
@@ -648,6 +674,7 @@ class AgentRunner @Inject constructor(
                 effectivePlanMode = false
                 mode = modeSwitch
                 appSettings.setAgentMode(modeSwitch)
+                prePlanMode = null
                 agentLog("Plan approved! Switching to $modeSwitch mode, unlocking all tools", LogLevel.INFO)
             }
         }

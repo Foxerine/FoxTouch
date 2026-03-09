@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CameraEnhance
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Key
+import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Security
@@ -78,6 +79,7 @@ import ai.foxtouch.data.preferences.SUPPORTED_LANGUAGES
 import ai.foxtouch.agent.getDefaultModel
 import ai.foxtouch.agent.getProviderInfo
 import ai.foxtouch.ui.overlay.FloatingBubbleService
+import android.view.inputmethod.InputMethodManager
 import android.provider.Settings as AndroidSettings
 import kotlinx.coroutines.launch
 
@@ -330,6 +332,23 @@ fun SettingsScreen(
                 },
             )
 
+            val imeEnabled = remember {
+                val imm = context.getSystemService(InputMethodManager::class.java)
+                imm.enabledInputMethodList.any { it.packageName == context.packageName }
+            }
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.ime_service)) },
+                supportingContent = {
+                    Text(stringResource(if (imeEnabled) R.string.ime_enabled else R.string.ime_not_enabled))
+                },
+                leadingContent = { Icon(Icons.Default.Keyboard, null) },
+                modifier = Modifier.clickable {
+                    context.startActivity(Intent(AndroidSettings.ACTION_INPUT_METHOD_SETTINGS).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    })
+                },
+            )
+
             ListItem(
                 headlineContent = { Text(stringResource(R.string.floating_overlay)) },
                 supportingContent = {
@@ -407,30 +426,32 @@ fun SettingsScreen(
             val appLanguage by viewModel.appLanguage.collectAsState()
             var showLanguageMenu by remember { mutableStateOf(false) }
 
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.app_language)) },
-                supportingContent = {
-                    Text(
-                        SUPPORTED_LANGUAGES.find { it.code == appLanguage }?.displayName
-                            ?: "System Default",
-                    )
-                },
-                leadingContent = { Icon(Icons.Default.Language, null) },
-                modifier = Modifier.clickable { showLanguageMenu = true },
-            )
+            Box {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.app_language)) },
+                    supportingContent = {
+                        Text(
+                            SUPPORTED_LANGUAGES.find { it.code == appLanguage }?.displayName
+                                ?: "System Default",
+                        )
+                    },
+                    leadingContent = { Icon(Icons.Default.Language, null) },
+                    modifier = Modifier.clickable { showLanguageMenu = true },
+                )
 
-            DropdownMenu(
-                expanded = showLanguageMenu,
-                onDismissRequest = { showLanguageMenu = false },
-            ) {
-                SUPPORTED_LANGUAGES.forEach { lang ->
-                    DropdownMenuItem(
-                        text = { Text(lang.displayName) },
-                        onClick = {
-                            viewModel.setAppLanguage(lang.code)
-                            showLanguageMenu = false
-                        },
-                    )
+                DropdownMenu(
+                    expanded = showLanguageMenu,
+                    onDismissRequest = { showLanguageMenu = false },
+                ) {
+                    SUPPORTED_LANGUAGES.forEach { lang ->
+                        DropdownMenuItem(
+                            text = { Text(lang.displayName) },
+                            onClick = {
+                                viewModel.setAppLanguage(lang.code)
+                                showLanguageMenu = false
+                            },
+                        )
+                    }
                 }
             }
 

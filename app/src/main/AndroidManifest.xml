@@ -69,6 +69,29 @@
             </intent-filter>
         </activity>
 
+        <!-- Transparent Activity for clipboard reading (gains focus, reads, finishes) -->
+        <activity
+            android:name=".accessibility.ClipboardReaderActivity"
+            android:theme="@style/Theme.FoxTouch.Transparent"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:exported="false" />
+
+        <!-- FoxTouch IME: invisible keyboard for programmatic text input + clipboard access -->
+        <service
+            android:name=".ime.FoxTouchIME"
+            android:label="FoxTouch Input"
+            android:permission="android.permission.BIND_INPUT_METHOD"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.view.InputMethod" />
+            </intent-filter>
+            <meta-data
+                android:name="android.view.im"
+                android:resource="@xml/ime_method" />
+        </service>
+
         <!-- Floating Bubble Service -->
         <service
             android:name=".ui.overlay.FloatingBubbleService"

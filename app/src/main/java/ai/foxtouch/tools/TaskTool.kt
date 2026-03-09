@@ -48,10 +48,10 @@ class UpdateTaskTool(
 
     override val definition = ToolDefinition(
         name = "update_task",
-        description = "Update a task's status. Valid statuses: pending, in_progress, completed, failed.",
+        description = "Update a task's status. Use \"deleted\" to remove a task permanently.",
         parameters = toolParameters {
             string("task_id", "The task ID to update", required = true)
-            enum("status", listOf("pending", "in_progress", "completed", "failed"), "New task status", required = true)
+            enum("status", listOf("pending", "in_progress", "completed", "failed", "deleted"), "New task status", required = true)
         },
     )
 
@@ -66,6 +66,11 @@ class UpdateTaskTool(
 
         val task = taskRepository.getById(taskId)
             ?: return ToolResult("Error: Task $taskId not found")
+
+        if (status == "deleted") {
+            taskRepository.delete(taskId)
+            return ToolResult("Task [${task.id}] '${task.title}' deleted")
+        }
 
         taskRepository.updateStatus(taskId, status)
         return ToolResult("Task [${task.id}] '${task.title}' updated to $status")

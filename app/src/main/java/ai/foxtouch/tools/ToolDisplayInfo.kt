@@ -47,21 +47,28 @@ object ToolDisplayRegistry {
             formatArgs = { "Capturing current screen content" },
             approvalMessage = { "FoxTouch wants to read the current screen." },
         ),
-        "click" to ToolDisplayInfo(
-            displayName = "Tap",
+        "click_element" to ToolDisplayInfo(
+            displayName = "Tap Element",
             formatArgs = { args ->
                 val elementId = args["element_id"]?.jsonPrimitive?.content
-                val x = args["x"]?.jsonPrimitive?.content
-                val y = args["y"]?.jsonPrimitive?.content
-                if (elementId != null) "Tap on element #$elementId"
-                else "Tap at ($x, $y)"
+                "Tap on element #$elementId"
             },
             approvalMessage = { args ->
                 val elementId = args["element_id"]?.jsonPrimitive?.content
+                "FoxTouch wants to tap on element #$elementId."
+            },
+        ),
+        "tap" to ToolDisplayInfo(
+            displayName = "Tap",
+            formatArgs = { args ->
                 val x = args["x"]?.jsonPrimitive?.content
                 val y = args["y"]?.jsonPrimitive?.content
-                if (elementId != null) "FoxTouch wants to tap on element #$elementId."
-                else "FoxTouch wants to tap at coordinates ($x, $y)."
+                "Tap at ($x, $y)"
+            },
+            approvalMessage = { args ->
+                val x = args["x"]?.jsonPrimitive?.content
+                val y = args["y"]?.jsonPrimitive?.content
+                "FoxTouch wants to tap at coordinates ($x, $y)."
             },
         ),
         "type_text" to ToolDisplayInfo(
@@ -75,6 +82,39 @@ object ToolDisplayRegistry {
                 val text = args["text"]?.jsonPrimitive?.content ?: ""
                 val preview = if (text.length > 80) text.take(80) + "..." else text
                 "FoxTouch wants to type: \"$preview\""
+            },
+        ),
+        "type_at" to ToolDisplayInfo(
+            displayName = "Type At",
+            formatArgs = { args ->
+                val text = args["text"]?.jsonPrimitive?.content ?: ""
+                val x = args["x"]?.jsonPrimitive?.content
+                val y = args["y"]?.jsonPrimitive?.content
+                val preview = if (text.length > 40) text.take(40) + "..." else text
+                "Type \"$preview\" at ($x, $y)"
+            },
+            approvalMessage = { args ->
+                val text = args["text"]?.jsonPrimitive?.content ?: ""
+                val x = args["x"]?.jsonPrimitive?.content
+                val y = args["y"]?.jsonPrimitive?.content
+                val preview = if (text.length > 80) text.take(80) + "..." else text
+                "FoxTouch wants to type \"$preview\" at ($x, $y)."
+            },
+        ),
+        "clipboard" to ToolDisplayInfo(
+            displayName = "Clipboard",
+            formatArgs = { args ->
+                val action = args["action"]?.jsonPrimitive?.content ?: "read"
+                if (action == "write") {
+                    val text = args["text"]?.jsonPrimitive?.content ?: ""
+                    val preview = if (text.length > 40) text.take(40) + "..." else text
+                    "Write: \"$preview\""
+                } else "Read clipboard"
+            },
+            approvalMessage = { args ->
+                val action = args["action"]?.jsonPrimitive?.content ?: "read"
+                if (action == "write") "FoxTouch wants to write to the clipboard."
+                else "FoxTouch wants to read the clipboard."
             },
         ),
         "scroll" to ToolDisplayInfo(
@@ -190,11 +230,12 @@ object ToolDisplayRegistry {
             displayName = "Update Task",
             formatArgs = { args ->
                 val status = args["status"]?.jsonPrimitive?.content ?: ""
-                "Update task → $status"
+                if (status == "deleted") "Delete task" else "Update task → $status"
             },
             approvalMessage = { args ->
                 val status = args["status"]?.jsonPrimitive?.content ?: ""
-                "FoxTouch wants to mark a task as $status."
+                if (status == "deleted") "FoxTouch wants to delete a task."
+                else "FoxTouch wants to mark a task as $status."
             },
         ),
         "ask_user" to ToolDisplayInfo(

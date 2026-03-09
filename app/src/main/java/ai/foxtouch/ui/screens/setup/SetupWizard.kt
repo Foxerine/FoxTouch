@@ -24,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Link
@@ -69,6 +70,7 @@ import ai.foxtouch.agent.ModelInfo
 import ai.foxtouch.agent.getDefaultModel
 import ai.foxtouch.ui.screens.settings.ModelListState
 import ai.foxtouch.ui.screens.settings.SettingsViewModel
+import android.view.inputmethod.InputMethodManager
 import android.provider.Settings as AndroidSettings
 import kotlinx.coroutines.launch
 
@@ -462,6 +464,10 @@ private fun PermissionsStep(onNext: () -> Unit) {
     val context = LocalContext.current
     val a11yConnected = AccessibilityBridge.isServiceConnected
     val canDrawOverlays = AndroidSettings.canDrawOverlays(context)
+    val imeEnabled = remember {
+        val imm = context.getSystemService(InputMethodManager::class.java)
+        imm.enabledInputMethodList.any { it.packageName == context.packageName }
+    }
     val allGranted = a11yConnected && canDrawOverlays
 
     Column(
@@ -555,6 +561,41 @@ private fun PermissionsStep(onNext: () -> Unit) {
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Grant Overlay Permission")
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        // ── Input Method (Optional) ──
+        SectionLabel("Input Method (Optional)")
+
+        if (imeEnabled) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.primary)
+                Spacer(Modifier.width(8.dp))
+                Text("Enabled", color = MaterialTheme.colorScheme.primary)
+            }
+        } else {
+            Text(
+                text = "Enables reliable text input and clipboard access across all apps. " +
+                    "FoxTouch will temporarily switch to its invisible keyboard when typing, " +
+                    "then switch back automatically.",
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = {
+                    context.startActivity(Intent(AndroidSettings.ACTION_INPUT_METHOD_SETTINGS).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    })
+                },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(Icons.Default.Keyboard, null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Enable FoxTouch Input")
             }
         }
 

@@ -51,7 +51,9 @@ import androidx.compose.ui.unit.dp
 import ai.foxtouch.R
 import ai.foxtouch.agent.AgentState
 import ai.foxtouch.data.db.entity.TaskEntity
+import ai.foxtouch.data.preferences.AgentMode
 import ai.foxtouch.tools.ToolDisplayRegistry
+import ai.foxtouch.ui.components.AgentModeToggle
 import ai.foxtouch.ui.components.TaskProgressPanel
 import ai.foxtouch.ui.components.agentStateColor
 import ai.foxtouch.ui.components.agentStateLabelRes
@@ -69,10 +71,12 @@ import com.mikepenz.markdown.m3.markdownTypography
 fun OverlayBar(
     state: AgentState,
     isBusy: Boolean,
+    agentMode: AgentMode = AgentMode.NORMAL,
     isExpanded: Boolean,
     lastMessage: String?,
     tasks: List<TaskEntity> = emptyList(),
     taskProgress: TaskProgress = TaskProgress(),
+    onCycleAgentMode: () -> Unit = {},
     onToggleExpand: () -> Unit,
     onStop: () -> Unit,
     onOpenApp: () -> Unit,
@@ -145,6 +149,14 @@ fun OverlayBar(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f),
                 )
+
+                // Agent mode toggle
+                AgentModeToggle(
+                    mode = agentMode,
+                    onCycle = onCycleAgentMode,
+                )
+
+                Spacer(Modifier.width(4.dp))
 
                 // Stop button (when busy)
                 if (isBusy) {

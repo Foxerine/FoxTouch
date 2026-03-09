@@ -173,6 +173,10 @@
     <string name="tool_permissions_desc">Configure per-tool approval policy</string>
     <string name="tool_permissions_info">Configure which tools require approval before execution.</string>
     <string name="tool_permissions_hint">You can change tool permissions when the agent asks for approval by tapping \'Always Allow This Tool\'.</string>
+    <string name="ime_service">FoxTouch Input Method</string>
+    <string name="ime_enabled">Enabled</string>
+    <string name="ime_not_enabled">Not enabled - tap to enable</string>
+    <string name="ime_desc">Enables reliable text input and clipboard access across all apps</string>
     <string name="enhanced_screenshot">Enhanced Screenshot</string>
     <string name="enhanced_screenshot_desc">Use MediaProjection for apps that block accessibility screenshots (e.g., WeChat)</string>
     <string name="enhanced_screenshot_grant">Grant screen capture permission first</string>

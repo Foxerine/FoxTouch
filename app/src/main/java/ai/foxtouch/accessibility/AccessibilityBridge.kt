@@ -1,15 +1,24 @@
 package ai.foxtouch.accessibility
 
 import android.accessibilityservice.AccessibilityService
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.view.accessibility.AccessibilityWindowInfo
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Build
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import android.view.accessibility.AccessibilityNodeInfo
 import ai.foxtouch.data.preferences.AppSettings
 import ai.foxtouch.data.preferences.ScreenshotMode
+import ai.foxtouch.ime.FoxTouchIME
+import android.view.inputmethod.InputMethodManager
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.ByteArrayOutputStream
 
 /**
@@ -329,6 +338,21 @@ object AccessibilityBridge {
         return focused.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args)
     }
 
+    /**
+     * Last-resort typing: write text to clipboard, then perform PASTE action
+     * on the focused input field. Works for apps that reject ACTION_SET_TEXT
+     * but accept standard clipboard paste (e.g., WeChat search).
+     */
+    fun typeTextViaPaste(text: String): Boolean {
+        val service = _service ?: return false
+        val clipboard = service.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("FoxTouch", text))
+
+        val root = service.rootInActiveWindow ?: return false
+        val focused = root.findFocus(AccessibilityNodeInfo.FOCUS_INPUT) ?: return false
+        return focused.performAction(AccessibilityNodeInfo.ACTION_PASTE)
+    }
+
     fun scroll(direction: String, elementId: Int? = null): Boolean = synchronized(nodeLock) {
         val target = if (elementId != null) {
             nodeMap[elementId]
@@ -391,5 +415,145 @@ object AccessibilityBridge {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
         return true
+    }
+
+    // ── Clipboard ─────────────────────────────────────────────────────
+
+    private const val IME_ID = "ai.foxtouch/.ime.FoxTouchIME"
+
+    /**
+     * Read clipboard content reliably, even from an overlay / background context.
+     *
+     * Strategy (in order):
+     * 1. If FoxTouchIME is active → read via IME (IMEs are exempt from clipboard restrictions)
+     * 2. Try direct read via accessibility service context
+     * 3. Launch a transparent [ClipboardReaderActivity] to gain window focus and read
+     *
+     * Steps 1–2 are synchronous; step 3 is async (launches an Activity).
+     */
+    suspend fun readClipboard(): String? {
+        // 1. IME path — always works when FoxTouchIME is the active keyboard
+        FoxTouchIME.instance?.readClipboard()?.let { return it }
+
+        // 2. Direct read via accessibility service context
+        val service = _service
+        if (service != null) {
+            try {
+                val clipboard = service.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = clipboard.primaryClip
+                if (clip != null && clip.itemCount > 0) {
+                    val text = clip.getItemAt(0).text?.toString()
+                    if (text != null) return text
+                }
+            } catch (_: Exception) {}
+        }
+
+        // 3. Transparent Activity — gains window focus to bypass Android 10+ restriction
+        return readClipboardViaActivity()
+    }
+
+    /**
+     * Launch [ClipboardReaderActivity] to gain window focus and read the clipboard.
+     * Returns the clipboard text, or null if the read fails or times out.
+     */
+    private suspend fun readClipboardViaActivity(): String? {
+        val service = _service ?: return null
+        val deferred = CompletableDeferred<String?>()
+        ClipboardReaderActivity.pendingResult = deferred
+
+        val intent = Intent(service, ClipboardReaderActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        service.startActivity(intent)
+
+        return withTimeoutOrNull(2000L) { deferred.await() }
+    }
+
+    /**
+     * Write text to the system clipboard.
+     */
+    fun writeClipboard(text: String) {
+        val service = requireService()
+        val clipboard = service.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("FoxTouch", text))
+    }
+
+    // ── IME-based text input ────────────────────────────────────────
+
+    /**
+     * Check if FoxTouchIME is enabled in system settings.
+     *
+     * Uses [InputMethodManager] API instead of reading Settings.Secure directly,
+     * which is restricted on Android 14+ (targetSdk 34+).
+     */
+    fun isImeEnabled(): Boolean {
+        val service = _service ?: return false
+        return try {
+            val imm = service.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.enabledInputMethodList.any { it.packageName == service.packageName }
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to check IME enabled status", e)
+            false
+        }
+    }
+
+    /**
+     * Check if FoxTouchIME is the currently active IME.
+     */
+    fun isImeActive(): Boolean {
+        // If FoxTouchIME instance exists, it's active
+        return FoxTouchIME.instance != null
+    }
+
+    /**
+     * Type text using FoxTouchIME if available (API 31+).
+     *
+     * Flow: switch to FoxTouchIME → wait for instance →
+     * commitText → switch back to previous IME.
+     *
+     * Returns false (no-op) if IME is not enabled or API < 31,
+     * allowing callers to fall back to ACTION_SET_TEXT.
+     */
+    suspend fun typeTextViaIme(text: String): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return false
+        if (!isImeEnabled()) return false
+
+        val service = _service ?: return false
+
+        // Already active? Just commit.
+        val existingIme = FoxTouchIME.instance
+        if (existingIme != null) {
+            return existingIme.commitText(text)
+        }
+
+        // Switch to FoxTouchIME
+        try {
+            service.softKeyboardController.switchToInputMethod(IME_ID)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to switch to FoxTouchIME", e)
+            return false
+        }
+
+        // Wait for FoxTouchIME instance to become available
+        val ime = withTimeoutOrNull(1500L) {
+            while (FoxTouchIME.instance == null) {
+                delay(50)
+            }
+            // Give InputConnection a moment to bind
+            delay(100)
+            FoxTouchIME.instance
+        }
+
+        if (ime == null) {
+            Log.w(TAG, "FoxTouchIME instance not available after switch")
+            return false
+        }
+
+        val result = ime.commitText(text)
+
+        // Switch back to previous IME
+        ime.switchBack()
+
+        return result
     }
 }
