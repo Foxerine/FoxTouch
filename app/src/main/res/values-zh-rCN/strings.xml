@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="a11y_service_description">FoxTouch 使用无障碍服务读取屏幕内容并代您执行操作。它会捕获界面元素树和截图，帮助 AI 助手理解并操控您的手机。</string>
+
+    <!-- Chat -->
+    <string name="chat_input_hint">告诉 FoxTouch 你想做什么…</string>
+    <string name="send">发送</string>
+    <string name="new_chat">新对话</string>
+    <string name="clear_chat">清空对话</string>
+    <string name="copy">复制</string>
+    <string name="agent_logs">Agent 日志</string>
+    <string name="stop">停止</string>
+    <string name="error_prefix">错误：%s</string>
+    <string name="dismiss">关闭</string>
+    <string name="no_messages_yet">暂无消息</string>
+
+    <!-- Agent State Labels -->
+    <string name="state_idle">空闲</string>
+    <string name="state_thinking">思考中…</string>
+    <string name="state_acting">执行中：%s</string>
+    <string name="state_needs_approval">需要批准</string>
+    <string name="state_plan_ready">计划就绪</string>
+    <string name="state_asking_user">有问题要问你</string>
+    <string name="state_confirming_completion">任务完成？</string>
+    <string name="state_error">出错了</string>
+
+    <!-- Setup -->
+    <string name="setup_welcome_title">欢迎使用 FoxTouch</string>
+    <string name="setup_welcome_desc">你的 AI 手机助手。告诉它你想做什么，它会替你操作手机。</string>
+    <string name="setup_api_key_title">配置 LLM 提供商</string>
+    <string name="setup_api_key_desc">输入你的 API 密钥以连接 AI 模型。</string>
+    <string name="setup_a11y_title">启用无障碍服务</string>
+    <string name="setup_a11y_desc">FoxTouch 需要无障碍权限来读取和操控你的屏幕。</string>
+    <string name="setup_done_title">设置完成！</string>
+    <string name="setup_done_desc">FoxTouch 已准备就绪。开始告诉它你需要什么吧。</string>
+
+    <!-- Permissions / Approval -->
+    <string name="approval_title">需要工具授权</string>
+    <string name="approve">允许</string>
+    <string name="deny">拒绝</string>
+    <string name="always_allow">始终允许</string>
+    <string name="always">始终</string>
+
+    <!-- Overlay -->
+    <string name="open_foxtouch">打开 FoxTouch</string>
+    <string name="collapse">收起</string>
+    <string name="expand">展开</string>
+    <string name="type_answer_hint">输入回答…</string>
+    <string name="plan_ready_for_review">计划待审核</string>
+    <string name="reject">拒绝</string>
+    <string name="approve_plan">批准</string>
+    <string name="auto_mode">自动</string>
+
+    <!-- Plan Review Sheet -->
+    <string name="plan_review_title">计划审核</string>
+    <string name="plan_review_desc">AI 已生成操作计划。请审核并选择执行方式：</string>
+    <string name="execute_plan">执行计划</string>
+    <string name="execute_auto">自动执行</string>
+    <string name="reject_plan">拒绝计划</string>
+    <string name="request_modification">请求修改</string>
+    <string name="modification_hint">需要修改什么？</string>
+
+    <!-- User Question Sheet -->
+    <string name="foxtouch_asks">FoxTouch 问你：</string>
+    <string name="your_answer_hint">你的回答…</string>
+    <string name="submit">提交</string>
+
+    <!-- Settings -->
+    <string name="settings_title">设置</string>
+    <string name="settings_api_key">API 密钥</string>
+    <string name="settings_provider">LLM 提供商</string>
+    <string name="settings_model">模型</string>
+    <string name="settings_permissions">工具权限</string>
+    <string name="settings_about">关于</string>
+    <string name="settings_overlay">显示悬浮窗</string>
+    <string name="settings_debug_mode">调试模式</string>
+    <string name="settings_streaming">流式传输</string>
+    <string name="settings_proxy">HTTP 代理</string>
+    <string name="settings_base_url">自定义 Base URL</string>
+
+    <!-- Agent Mode -->
+    <string name="mode_normal">普通</string>
+    <string name="mode_plan">计划</string>
+    <string name="mode_yolo">自动</string>
+
+    <!-- Tasks -->
+    <string name="tasks_title">任务</string>
+    <string name="task_completed">已完成</string>
+    <string name="task_in_progress">进行中</string>
+    <string name="task_failed">失败</string>
+    <string name="task_pending">待处理</string>
+
+    <!-- Sessions -->
+    <string name="sessions_title">会话</string>
+    <string name="delete_session">删除</string>
+    <string name="untitled_session">未命名</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_overlay">FoxTouch 悬浮窗</string>
+    <string name="notification_channel_agent">FoxTouch Agent</string>
+    <string name="notification_tap_to_open">点击打开</string>
+    <string name="notification_waiting_answer">等待你的回答…</string>
+    <string name="notification_plan_review">计划待审核</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_history">对话历史</string>
+    <string name="delete_all">全部删除</string>
+    <string name="delete_all_title">删除所有对话</string>
+    <string name="delete_all_message">这将删除所有其他对话并清空当前对话。此操作无法撤销。</string>
+    <string name="cancel">取消</string>
+    <string name="custom_response">%d. 自定义回答…</string>
+    <string name="type_your_answer">输入你的回答…</string>
+    <string name="describe_changes">描述需要修改的内容…</string>
+    <string name="approve_manual">批准（手动审核）</string>
+    <string name="approve_auto">批准（自动执行）</string>
+    <string name="tasks_count">任务（%d）</string>
+    <string name="working">执行中…</string>
+    <string name="thinking">思考中…</string>
+    <string name="executing">执行中：%s</string>
+    <string name="waiting_approval">等待批准：%s</string>
+    <string name="empty_state_subtitle">你的 AI 手机助手。告诉我你想做什么。</string>
+    <string name="logs_title">Agent 日志</string>
+    <string name="entries_count">%d 条记录</string>
+    <string name="no_logs_yet">暂无日志。发送消息以查看 Agent 活动。</string>
+
+    <!-- Settings Screen -->
+    <string name="section_ai_model">AI 模型</string>
+    <string name="section_api_key">API 密钥</string>
+    <string name="section_network">网络</string>
+    <string name="section_agent">Agent</string>
+    <string name="section_assistant">助手</string>
+    <string name="section_voice">语音</string>
+    <string name="section_permissions">权限</string>
+    <string name="section_language">语言</string>
+    <string name="section_about">关于</string>
+    <string name="section_debug">调试</string>
+    <string name="provider">提供商</string>
+    <string name="model">模型</string>
+    <string name="configure_api_key">配置 API 密钥</string>
+    <string name="encrypted_with_tink">使用 Google Tink 加密</string>
+    <string name="base_url">Base URL</string>
+    <string name="base_url_placeholder">默认（自动匹配提供商）</string>
+    <string name="save_base_url">保存 Base URL</string>
+    <string name="http_proxy">HTTP 代理</string>
+    <string name="proxy_placeholder">例如 127.0.0.1:7890</string>
+    <string name="save_proxy">保存代理</string>
+    <string name="streaming">流式传输</string>
+    <string name="streaming_on">实时流式输出</string>
+    <string name="streaming_off">等待完整响应</string>
+    <string name="max_iterations">最大迭代次数</string>
+    <string name="per_turn">每轮 %d 次</string>
+    <string name="thinking_mode">思考模式</string>
+    <string name="thinking_mode_on">启用深度思考</string>
+    <string name="thinking_mode_off">仅直接回答</string>
+    <string name="agent_instructions">Agent 指令与记忆</string>
+    <string name="agent_instructions_desc">编辑 Agent 指令，查看 AI 记忆</string>
+    <string name="set_default_assistant">设为默认助手</string>
+    <string name="set_default_assistant_desc">将 FoxTouch 设为系统数字助手</string>
+    <string name="tts_title">文字转语音</string>
+    <string name="tts_desc">朗读助手回复</string>
+    <string name="speech_rate">语速</string>
+    <string name="a11y_service">无障碍服务</string>
+    <string name="a11y_connected">已连接</string>
+    <string name="a11y_not_connected">未连接 - 点击启用</string>
+    <string name="overlay_permission">悬浮窗权限</string>
+    <string name="overlay_granted">已授权</string>
+    <string name="overlay_not_granted">未授权 - 点击启用</string>
+    <string name="floating_overlay">悬浮窗</string>
+    <string name="overlay_on_desc">Agent 执行时显示状态气泡</string>
+    <string name="overlay_off_desc">隐藏悬浮窗 - Agent 在后台静默工作</string>
+    <string name="tool_permissions">工具权限</string>
+    <string name="tool_permissions_desc">配置每个工具的审批策略</string>
+    <string name="tool_permissions_info">配置哪些工具在执行前需要审批。</string>
+    <string name="tool_permissions_hint">你可以在 Agent 请求批准时，点击"始终允许此工具"来更改权限。</string>
+    <string name="yolo_warning_title">YOLO 模式警告</string>
+    <string name="yolo_warning_desc">YOLO 模式激活时，AI 将执行所有操作（点击、输入、滑动、启动应用）而不请求批准。使用风险自负。你可以在聊天界面使用切换按钮来切换模式。</string>
+    <string name="app_language">应用语言</string>
+    <string name="system_default">跟随系统</string>
+    <string name="about_version">FoxTouch v0.1.0</string>
+    <string name="about_desc">AI 手机助手</string>
+    <string name="about_desc_debug">AI 手机助手（调试模式已启用）</string>
+    <string name="json_display_mode">JSON 显示模式</string>
+    <string name="json_display_desc">在工具调用和审批对话框中显示原始 JSON</string>
+    <string name="preview_device_context">预览设备上下文</string>
+    <string name="preview_device_context_desc">查看 AI 接收到的设备信息</string>
+    <string name="disable_debug">关闭调试模式</string>
+    <string name="disable_debug_desc">隐藏调试选项</string>
+    <string name="device_context_title">设备上下文预览</string>
+    <string name="device_context_desc">以下是注入到 AI 系统提示词中的设备信息：</string>
+    <string name="api_key_label">API 密钥</string>
+    <string name="save">保存</string>
+    <string name="close">关闭</string>
+    <string name="ok">确定</string>
+    <string name="back">返回</string>
+
+    <!-- Voice -->
+    <string name="voice_listening">正在聆听…</string>
+    <string name="voice_speak">说话</string>
+    <string name="tts_on">语音已开</string>
+    <string name="tts_off">语音已关</string>
+    <string name="voice_unavailable_title">语音识别不可用</string>
+    <string name="voice_unavailable_message">此设备不支持语音识别。请安装或启用 Google 应用以使用语音输入。</string>
+    <string name="install_google_app">安装 Google 应用</string>
+
+    <!-- Confirm Completion -->
+    <string name="completion_title">任务已完成？</string>
+    <string name="completion_confirmed">已完成</string>
+    <string name="completion_not_done">未完成</string>
+    <string name="completion_reason_hint">还有什么需要做的？</string>
+
+    <!-- Skills -->
+    <string name="save_as_skill">保存为技能</string>
+
+    <!-- Custom Model -->
+    <string name="custom_model">自定义模型</string>
+    <string name="custom_model_hint">输入模型名称（如 gpt-4o）</string>
+    <string name="custom_model_option">自定义模型…</string>
+
+    <!-- Provider Management -->
+    <string name="key_configured">已配置 API 密钥</string>
+    <string name="key_not_configured">未配置 API 密钥</string>
+    <string name="model_fetch_retry">重试</string>
+</resources>

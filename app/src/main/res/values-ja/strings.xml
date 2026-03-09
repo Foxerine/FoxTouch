@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="a11y_service_description">FoxTouch はアクセシビリティサービスを使用して画面の内容を読み取り、操作を代行します。UI要素ツリーとスクリーンショットをキャプチャし、AIアシスタントがスマートフォンを理解・操作できるようにします。</string>
+
+    <!-- Chat -->
+    <string name="chat_input_hint">FoxTouch に何をしてほしいか伝えてください…</string>
+    <string name="send">送信</string>
+    <string name="new_chat">新規チャット</string>
+    <string name="clear_chat">チャットをクリア</string>
+    <string name="copy">コピー</string>
+    <string name="agent_logs">エージェントログ</string>
+    <string name="stop">停止</string>
+    <string name="error_prefix">エラー：%s</string>
+    <string name="dismiss">閉じる</string>
+    <string name="no_messages_yet">メッセージはまだありません</string>
+
+    <!-- Agent State Labels -->
+    <string name="state_idle">待機中</string>
+    <string name="state_thinking">考え中…</string>
+    <string name="state_acting">実行中：%s</string>
+    <string name="state_needs_approval">承認が必要</string>
+    <string name="state_plan_ready">プラン準備完了</string>
+    <string name="state_asking_user">質問があります</string>
+    <string name="state_error">エラー</string>
+
+    <!-- Setup -->
+    <string name="setup_welcome_title">FoxTouch へようこそ</string>
+    <string name="setup_welcome_desc">AIスマホエージェント。やりたいことを伝えるだけで、スマホを操作します。</string>
+    <string name="setup_api_key_title">LLMプロバイダーの設定</string>
+    <string name="setup_api_key_desc">APIキーを入力してAIモデルに接続します。</string>
+    <string name="setup_a11y_title">アクセシビリティを有効にする</string>
+    <string name="setup_a11y_desc">FoxTouch は画面の読み取りと操作にアクセシビリティ権限が必要です。</string>
+    <string name="setup_done_title">準備完了！</string>
+    <string name="setup_done_desc">FoxTouch の準備ができました。何が必要か伝えてください。</string>
+
+    <!-- Permissions / Approval -->
+    <string name="approval_title">ツールの承認が必要</string>
+    <string name="approve">許可</string>
+    <string name="deny">拒否</string>
+    <string name="always_allow">常に許可</string>
+    <string name="always">常に</string>
+
+    <!-- Overlay -->
+    <string name="open_foxtouch">FoxTouch を開く</string>
+    <string name="collapse">閉じる</string>
+    <string name="expand">展開</string>
+    <string name="type_answer_hint">回答を入力…</string>
+    <string name="plan_ready_for_review">プラン確認待ち</string>
+    <string name="reject">却下</string>
+    <string name="approve_plan">承認</string>
+    <string name="auto_mode">自動</string>
+
+    <!-- Plan Review Sheet -->
+    <string name="plan_review_title">プラン確認</string>
+    <string name="plan_review_desc">AIがプランを作成しました。確認して実行方法を選択してください：</string>
+    <string name="execute_plan">プランを実行</string>
+    <string name="execute_auto">自動実行</string>
+    <string name="reject_plan">プランを却下</string>
+    <string name="request_modification">変更を依頼</string>
+    <string name="modification_hint">何を変更しますか？</string>
+
+    <!-- User Question Sheet -->
+    <string name="foxtouch_asks">FoxTouch からの質問：</string>
+    <string name="your_answer_hint">回答を入力…</string>
+    <string name="submit">送信</string>
+
+    <!-- Settings -->
+    <string name="settings_title">設定</string>
+    <string name="settings_api_key">APIキー</string>
+    <string name="settings_provider">LLMプロバイダー</string>
+    <string name="settings_model">モデル</string>
+    <string name="settings_permissions">ツール権限</string>
+    <string name="settings_about">情報</string>
+    <string name="settings_overlay">オーバーレイ表示</string>
+    <string name="settings_debug_mode">デバッグモード</string>
+    <string name="settings_streaming">ストリーミング</string>
+    <string name="settings_proxy">HTTPプロキシ</string>
+    <string name="settings_base_url">カスタムBase URL</string>
+
+    <!-- Agent Mode -->
+    <string name="mode_normal">通常</string>
+    <string name="mode_plan">プラン</string>
+    <string name="mode_yolo">自動</string>
+
+    <!-- Tasks -->
+    <string name="tasks_title">タスク</string>
+    <string name="task_completed">完了</string>
+    <string name="task_in_progress">実行中</string>
+    <string name="task_failed">失敗</string>
+    <string name="task_pending">保留中</string>
+
+    <!-- Sessions -->
+    <string name="sessions_title">セッション</string>
+    <string name="delete_session">削除</string>
+    <string name="untitled_session">無題</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_overlay">FoxTouch オーバーレイ</string>
+    <string name="notification_channel_agent">FoxTouch エージェント</string>
+    <string name="notification_tap_to_open">タップして開く</string>
+    <string name="notification_waiting_answer">回答をお待ちしています…</string>
+    <string name="notification_plan_review">プラン確認待ち</string>
+
+    <!-- Voice -->
+    <string name="voice_listening">聞いています…</string>
+    <string name="voice_speak">話す</string>
+    <string name="tts_on">音声オン</string>
+    <string name="tts_off">音声オフ</string>
+</resources>

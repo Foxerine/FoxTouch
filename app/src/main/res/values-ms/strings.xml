@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="a11y_service_description">FoxTouch menggunakan perkhidmatan kebolehcapaian untuk membaca kandungan skrin dan melakukan tindakan bagi pihak anda. Ia menangkap pokok elemen UI dan tangkapan skrin untuk membantu ejen AI memahami dan berinteraksi dengan telefon anda.</string>
+
+    <!-- Chat -->
+    <string name="chat_input_hint">Beritahu FoxTouch apa yang perlu dilakukan…</string>
+    <string name="send">Hantar</string>
+    <string name="new_chat">Sembang baharu</string>
+    <string name="clear_chat">Padam sembang</string>
+    <string name="copy">Salin</string>
+    <string name="agent_logs">Log ejen</string>
+    <string name="stop">Berhenti</string>
+    <string name="error_prefix">Ralat: %s</string>
+    <string name="dismiss">Tutup</string>
+    <string name="no_messages_yet">Tiada mesej lagi</string>
+
+    <!-- Agent State Labels -->
+    <string name="state_idle">Sedia</string>
+    <string name="state_thinking">Berfikir…</string>
+    <string name="state_acting">Melaksanakan: %s</string>
+    <string name="state_needs_approval">Perlu kelulusan</string>
+    <string name="state_plan_ready">Rancangan sedia</string>
+    <string name="state_asking_user">Ada soalan untuk anda</string>
+    <string name="state_error">Ralat</string>
+
+    <!-- Setup -->
+    <string name="setup_welcome_title">Selamat datang ke FoxTouch</string>
+    <string name="setup_welcome_desc">Ejen telefon AI anda. Beritahu ia apa yang perlu dilakukan dan ia akan mengendalikan telefon anda.</string>
+    <string name="setup_api_key_title">Konfigurasikan penyedia LLM</string>
+    <string name="setup_api_key_desc">Masukkan kunci API anda untuk menyambung ke model AI.</string>
+    <string name="setup_a11y_title">Aktifkan kebolehcapaian</string>
+    <string name="setup_a11y_desc">FoxTouch memerlukan kebenaran kebolehcapaian untuk membaca dan berinteraksi dengan skrin anda.</string>
+    <string name="setup_done_title">Sedia!</string>
+    <string name="setup_done_desc">FoxTouch sudah sedia. Mulakan dengan memberitahu ia apa yang anda perlukan.</string>
+
+    <!-- Permissions / Approval -->
+    <string name="approval_title">Kelulusan alat diperlukan</string>
+    <string name="approve">Benarkan</string>
+    <string name="deny">Tolak</string>
+    <string name="always_allow">Sentiasa benarkan</string>
+    <string name="always">Sentiasa</string>
+
+    <!-- Overlay -->
+    <string name="open_foxtouch">Buka FoxTouch</string>
+    <string name="collapse">Kecilkan</string>
+    <string name="expand">Besarkan</string>
+    <string name="type_answer_hint">Taip jawapan…</string>
+    <string name="plan_ready_for_review">Rancangan sedia untuk semakan</string>
+    <string name="reject">Tolak</string>
+    <string name="approve_plan">Luluskan</string>
+    <string name="auto_mode">Auto</string>
+
+    <!-- Plan Review Sheet -->
+    <string name="plan_review_title">Semakan rancangan</string>
+    <string name="plan_review_desc">AI telah menjana rancangan. Semak dan pilih cara untuk meneruskan:</string>
+    <string name="execute_plan">Laksanakan rancangan</string>
+    <string name="execute_auto">Laksanakan automatik</string>
+    <string name="reject_plan">Tolak rancangan</string>
+    <string name="request_modification">Minta pengubahsuaian</string>
+    <string name="modification_hint">Apa yang perlu diubah?</string>
+
+    <!-- User Question Sheet -->
+    <string name="foxtouch_asks">FoxTouch bertanya:</string>
+    <string name="your_answer_hint">Jawapan anda…</string>
+    <string name="submit">Hantar</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Tetapan</string>
+    <string name="settings_api_key">Kunci API</string>
+    <string name="settings_provider">Penyedia LLM</string>
+    <string name="settings_model">Model</string>
+    <string name="settings_permissions">Kebenaran alat</string>
+    <string name="settings_about">Perihal</string>
+    <string name="settings_overlay">Papar tindanan</string>
+    <string name="settings_debug_mode">Mod nyahpepijat</string>
+    <string name="settings_streaming">Penstriman</string>
+    <string name="settings_proxy">Proksi HTTP</string>
+    <string name="settings_base_url">URL asas tersuai</string>
+
+    <!-- Agent Mode -->
+    <string name="mode_normal">Normal</string>
+    <string name="mode_plan">Rancangan</string>
+    <string name="mode_yolo">Auto</string>
+
+    <!-- Tasks -->
+    <string name="tasks_title">Tugasan</string>
+    <string name="task_completed">selesai</string>
+    <string name="task_in_progress">sedang berjalan</string>
+    <string name="task_failed">gagal</string>
+    <string name="task_pending">menunggu</string>
+
+    <!-- Sessions -->
+    <string name="sessions_title">Sesi</string>
+    <string name="delete_session">Padam</string>
+    <string name="untitled_session">Tanpa tajuk</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_overlay">Tindanan FoxTouch</string>
+    <string name="notification_channel_agent">Ejen FoxTouch</string>
+    <string name="notification_tap_to_open">Ketik untuk buka</string>
+    <string name="notification_waiting_answer">Menunggu jawapan anda…</string>
+    <string name="notification_plan_review">Rancangan sedia untuk semakan</string>
+
+    <!-- Voice -->
+    <string name="voice_listening">Mendengar…</string>
+    <string name="voice_speak">Bercakap</string>
+    <string name="tts_on">Suara dihidupkan</string>
+    <string name="tts_off">Suara dimatikan</string>
+</resources>

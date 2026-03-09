@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="a11y_service_description">FoxTouch utiliza el servicio de accesibilidad para leer el contenido de la pantalla y realizar acciones en tu nombre. Captura el árbol de elementos de la interfaz y capturas de pantalla para ayudar al agente de IA a entender e interactuar con tu teléfono.</string>
+
+    <!-- Chat -->
+    <string name="chat_input_hint">Dile a FoxTouch qué hacer…</string>
+    <string name="send">Enviar</string>
+    <string name="new_chat">Nuevo chat</string>
+    <string name="clear_chat">Borrar chat</string>
+    <string name="copy">Copiar</string>
+    <string name="agent_logs">Registros del agente</string>
+    <string name="stop">Detener</string>
+    <string name="error_prefix">Error: %s</string>
+    <string name="dismiss">Cerrar</string>
+    <string name="no_messages_yet">Aún no hay mensajes</string>
+
+    <!-- Agent State Labels -->
+    <string name="state_idle">Inactivo</string>
+    <string name="state_thinking">Pensando…</string>
+    <string name="state_acting">Ejecutando: %s</string>
+    <string name="state_needs_approval">Necesita aprobación</string>
+    <string name="state_plan_ready">Plan listo</string>
+    <string name="state_asking_user">Tiene una pregunta</string>
+    <string name="state_error">Error</string>
+
+    <!-- Setup -->
+    <string name="setup_welcome_title">Bienvenido a FoxTouch</string>
+    <string name="setup_welcome_desc">Tu agente de teléfono IA. Dile qué hacer y operará tu teléfono por ti.</string>
+    <string name="setup_api_key_title">Configurar proveedor LLM</string>
+    <string name="setup_api_key_desc">Ingresa tu clave API para conectar con un modelo de IA.</string>
+    <string name="setup_a11y_title">Habilitar accesibilidad</string>
+    <string name="setup_a11y_desc">FoxTouch necesita permiso de accesibilidad para leer e interactuar con tu pantalla.</string>
+    <string name="setup_done_title">¡Todo listo!</string>
+    <string name="setup_done_desc">FoxTouch está listo. Comienza diciéndole lo que necesitas.</string>
+
+    <!-- Permissions / Approval -->
+    <string name="approval_title">Aprobación de herramienta requerida</string>
+    <string name="approve">Permitir</string>
+    <string name="deny">Denegar</string>
+    <string name="always_allow">Permitir siempre</string>
+    <string name="always">Siempre</string>
+
+    <!-- Overlay -->
+    <string name="open_foxtouch">Abrir FoxTouch</string>
+    <string name="collapse">Contraer</string>
+    <string name="expand">Expandir</string>
+    <string name="type_answer_hint">Escribe tu respuesta…</string>
+    <string name="plan_ready_for_review">Plan listo para revisión</string>
+    <string name="reject">Rechazar</string>
+    <string name="approve_plan">Aprobar</string>
+    <string name="auto_mode">Auto</string>
+
+    <!-- Plan Review Sheet -->
+    <string name="plan_review_title">Revisión del plan</string>
+    <string name="plan_review_desc">La IA ha generado un plan. Revísalo y elige cómo proceder:</string>
+    <string name="execute_plan">Ejecutar plan</string>
+    <string name="execute_auto">Ejecución automática</string>
+    <string name="reject_plan">Rechazar plan</string>
+    <string name="request_modification">Solicitar modificación</string>
+    <string name="modification_hint">¿Qué se debe cambiar?</string>
+
+    <!-- User Question Sheet -->
+    <string name="foxtouch_asks">FoxTouch pregunta:</string>
+    <string name="your_answer_hint">Tu respuesta…</string>
+    <string name="submit">Enviar</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_api_key">Clave API</string>
+    <string name="settings_provider">Proveedor LLM</string>
+    <string name="settings_model">Modelo</string>
+    <string name="settings_permissions">Permisos de herramientas</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_overlay">Mostrar superposición</string>
+    <string name="settings_debug_mode">Modo depuración</string>
+    <string name="settings_streaming">Transmisión</string>
+    <string name="settings_proxy">Proxy HTTP</string>
+    <string name="settings_base_url">URL base personalizada</string>
+
+    <!-- Agent Mode -->
+    <string name="mode_normal">Normal</string>
+    <string name="mode_plan">Plan</string>
+    <string name="mode_yolo">Auto</string>
+
+    <!-- Tasks -->
+    <string name="tasks_title">Tareas</string>
+    <string name="task_completed">completada</string>
+    <string name="task_in_progress">en progreso</string>
+    <string name="task_failed">fallida</string>
+    <string name="task_pending">pendiente</string>
+
+    <!-- Sessions -->
+    <string name="sessions_title">Sesiones</string>
+    <string name="delete_session">Eliminar</string>
+    <string name="untitled_session">Sin título</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_overlay">Superposición FoxTouch</string>
+    <string name="notification_channel_agent">Agente FoxTouch</string>
+    <string name="notification_tap_to_open">Toca para abrir</string>
+    <string name="notification_waiting_answer">Esperando tu respuesta…</string>
+    <string name="notification_plan_review">Plan listo para revisión</string>
+
+    <!-- Voice -->
+    <string name="voice_listening">Escuchando…</string>
+    <string name="voice_speak">Hablar</string>
+    <string name="tts_on">Voz activada</string>
+    <string name="tts_off">Voz desactivada</string>
+</resources>

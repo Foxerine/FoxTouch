@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="a11y_service_description">FoxTouch는 접근성 서비스를 사용하여 화면 내용을 읽고 사용자를 대신하여 작업을 수행합니다. UI 요소 트리와 스크린샷을 캡처하여 AI 에이전트가 휴대폰을 이해하고 조작할 수 있도록 합니다.</string>
+
+    <!-- Chat -->
+    <string name="chat_input_hint">FoxTouch에게 무엇을 할지 알려주세요…</string>
+    <string name="send">보내기</string>
+    <string name="new_chat">새 채팅</string>
+    <string name="clear_chat">채팅 지우기</string>
+    <string name="copy">복사</string>
+    <string name="agent_logs">에이전트 로그</string>
+    <string name="stop">중지</string>
+    <string name="error_prefix">오류: %s</string>
+    <string name="dismiss">닫기</string>
+    <string name="no_messages_yet">메시지가 아직 없습니다</string>
+
+    <!-- Agent State Labels -->
+    <string name="state_idle">대기 중</string>
+    <string name="state_thinking">생각 중…</string>
+    <string name="state_acting">실행 중: %s</string>
+    <string name="state_needs_approval">승인 필요</string>
+    <string name="state_plan_ready">계획 준비 완료</string>
+    <string name="state_asking_user">질문이 있습니다</string>
+    <string name="state_error">오류</string>
+
+    <!-- Setup -->
+    <string name="setup_welcome_title">FoxTouch에 오신 것을 환영합니다</string>
+    <string name="setup_welcome_desc">AI 스마트폰 에이전트. 무엇을 할지 말하면 스마트폰을 대신 조작합니다.</string>
+    <string name="setup_api_key_title">LLM 제공자 설정</string>
+    <string name="setup_api_key_desc">API 키를 입력하여 AI 모델에 연결하세요.</string>
+    <string name="setup_a11y_title">접근성 활성화</string>
+    <string name="setup_a11y_desc">FoxTouch는 화면을 읽고 조작하기 위해 접근성 권한이 필요합니다.</string>
+    <string name="setup_done_title">준비 완료!</string>
+    <string name="setup_done_desc">FoxTouch가 준비되었습니다. 필요한 것을 알려주세요.</string>
+
+    <!-- Permissions / Approval -->
+    <string name="approval_title">도구 승인 필요</string>
+    <string name="approve">허용</string>
+    <string name="deny">거부</string>
+    <string name="always_allow">항상 허용</string>
+    <string name="always">항상</string>
+
+    <!-- Overlay -->
+    <string name="open_foxtouch">FoxTouch 열기</string>
+    <string name="collapse">접기</string>
+    <string name="expand">펼치기</string>
+    <string name="type_answer_hint">답변 입력…</string>
+    <string name="plan_ready_for_review">계획 검토 대기</string>
+    <string name="reject">거절</string>
+    <string name="approve_plan">승인</string>
+    <string name="auto_mode">자동</string>
+
+    <!-- Plan Review Sheet -->
+    <string name="plan_review_title">계획 검토</string>
+    <string name="plan_review_desc">AI가 계획을 작성했습니다. 검토 후 실행 방법을 선택하세요:</string>
+    <string name="execute_plan">계획 실행</string>
+    <string name="execute_auto">자동 실행</string>
+    <string name="reject_plan">계획 거절</string>
+    <string name="request_modification">수정 요청</string>
+    <string name="modification_hint">무엇을 수정할까요?</string>
+
+    <!-- User Question Sheet -->
+    <string name="foxtouch_asks">FoxTouch의 질문:</string>
+    <string name="your_answer_hint">답변 입력…</string>
+    <string name="submit">제출</string>
+
+    <!-- Settings -->
+    <string name="settings_title">설정</string>
+    <string name="settings_api_key">API 키</string>
+    <string name="settings_provider">LLM 제공자</string>
+    <string name="settings_model">모델</string>
+    <string name="settings_permissions">도구 권한</string>
+    <string name="settings_about">정보</string>
+    <string name="settings_overlay">오버레이 표시</string>
+    <string name="settings_debug_mode">디버그 모드</string>
+    <string name="settings_streaming">스트리밍</string>
+    <string name="settings_proxy">HTTP 프록시</string>
+    <string name="settings_base_url">커스텀 Base URL</string>
+
+    <!-- Agent Mode -->
+    <string name="mode_normal">일반</string>
+    <string name="mode_plan">계획</string>
+    <string name="mode_yolo">자동</string>
+
+    <!-- Tasks -->
+    <string name="tasks_title">작업</string>
+    <string name="task_completed">완료</string>
+    <string name="task_in_progress">진행 중</string>
+    <string name="task_failed">실패</string>
+    <string name="task_pending">대기 중</string>
+
+    <!-- Sessions -->
+    <string name="sessions_title">세션</string>
+    <string name="delete_session">삭제</string>
+    <string name="untitled_session">제목 없음</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_overlay">FoxTouch 오버레이</string>
+    <string name="notification_channel_agent">FoxTouch 에이전트</string>
+    <string name="notification_tap_to_open">탭하여 열기</string>
+    <string name="notification_waiting_answer">답변을 기다리고 있습니다…</string>
+    <string name="notification_plan_review">계획 검토 대기</string>
+
+    <!-- Voice -->
+    <string name="voice_listening">듣는 중…</string>
+    <string name="voice_speak">말하기</string>
+    <string name="tts_on">음성 켜기</string>
+    <string name="tts_off">음성 끄기</string>
+</resources>

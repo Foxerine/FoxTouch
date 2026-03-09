@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FoxTouch</string>
+    <string name="a11y_service_description">FoxTouch uses accessibility to read screen content and perform actions on your behalf. It captures UI element trees and screenshots to help the AI agent understand and interact with your phone.</string>
+
+    <!-- Chat -->
+    <string name="chat_input_hint">Tell FoxTouch what to do…</string>
+    <string name="send">Send</string>
+    <string name="new_chat">New Chat</string>
+    <string name="clear_chat">Clear Chat</string>
+    <string name="copy">Copy</string>
+    <string name="agent_logs">Agent Logs</string>
+    <string name="stop">Stop</string>
+    <string name="error_prefix">Error: %s</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="no_messages_yet">No messages yet</string>
+
+    <!-- Agent State Labels -->
+    <string name="state_idle">Idle</string>
+    <string name="state_thinking">Thinking…</string>
+    <string name="state_acting">Running: %s</string>
+    <string name="state_needs_approval">Needs approval</string>
+    <string name="state_plan_ready">Plan ready</string>
+    <string name="state_asking_user">Question for you</string>
+    <string name="state_confirming_completion">Task complete?</string>
+    <string name="state_error">Error</string>
+
+    <!-- Setup -->
+    <string name="setup_welcome_title">Welcome to FoxTouch</string>
+    <string name="setup_welcome_desc">Your AI phone agent. Tell it what to do, and it operates your phone for you.</string>
+    <string name="setup_api_key_title">Configure LLM Provider</string>
+    <string name="setup_api_key_desc">Enter your API key to connect to an AI model.</string>
+    <string name="setup_a11y_title">Enable Accessibility</string>
+    <string name="setup_a11y_desc">FoxTouch needs accessibility permission to read and interact with your screen.</string>
+    <string name="setup_done_title">All Set!</string>
+    <string name="setup_done_desc">FoxTouch is ready. Start by telling it what you need.</string>
+
+    <!-- Permissions / Approval -->
+    <string name="approval_title">Tool Approval Required</string>
+    <string name="approve">Allow</string>
+    <string name="deny">Deny</string>
+    <string name="always_allow">Always Allow</string>
+    <string name="always">Always</string>
+
+    <!-- Overlay -->
+    <string name="open_foxtouch">Open FoxTouch</string>
+    <string name="collapse">Collapse</string>
+    <string name="expand">Expand</string>
+    <string name="type_answer_hint">Type answer…</string>
+    <string name="plan_ready_for_review">Plan ready for review</string>
+    <string name="reject">Reject</string>
+    <string name="approve_plan">Approve</string>
+    <string name="auto_mode">Auto</string>
+
+    <!-- Plan Review Sheet -->
+    <string name="plan_review_title">Plan Review</string>
+    <string name="plan_review_desc">The AI has generated a plan. Review and choose how to proceed:</string>
+    <string name="execute_plan">Execute Plan</string>
+    <string name="execute_auto">Execute (Auto)</string>
+    <string name="reject_plan">Reject Plan</string>
+    <string name="request_modification">Request Modification</string>
+    <string name="modification_hint">What should be changed?</string>
+
+    <!-- User Question Sheet -->
+    <string name="foxtouch_asks">FoxTouch asks:</string>
+    <string name="your_answer_hint">Your answer…</string>
+    <string name="submit">Submit</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_api_key">API Key</string>
+    <string name="settings_provider">LLM Provider</string>
+    <string name="settings_model">Model</string>
+    <string name="settings_permissions">Tool Permissions</string>
+    <string name="settings_about">About</string>
+    <string name="settings_overlay">Show Overlay</string>
+    <string name="settings_debug_mode">Debug Mode</string>
+    <string name="settings_streaming">Streaming</string>
+    <string name="settings_proxy">HTTP Proxy</string>
+    <string name="settings_base_url">Custom Base URL</string>
+
+    <!-- Agent Mode -->
+    <string name="mode_normal">Normal</string>
+    <string name="mode_plan">Plan</string>
+    <string name="mode_yolo">YOLO</string>
+
+    <!-- Tasks -->
+    <string name="tasks_title">Tasks</string>
+    <string name="task_completed">completed</string>
+    <string name="task_in_progress">in progress</string>
+    <string name="task_failed">failed</string>
+    <string name="task_pending">pending</string>
+
+    <!-- Sessions -->
+    <string name="sessions_title">Sessions</string>
+    <string name="delete_session">Delete</string>
+    <string name="untitled_session">Untitled</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_overlay">FoxTouch Overlay</string>
+    <string name="notification_channel_agent">FoxTouch Agent</string>
+    <string name="notification_tap_to_open">Tap to open</string>
+    <string name="notification_waiting_answer">Waiting for your answer…</string>
+    <string name="notification_plan_review">Plan ready for review</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_history">Chat History</string>
+    <string name="delete_all">Delete All</string>
+    <string name="delete_all_title">Delete All Conversations</string>
+    <string name="delete_all_message">This will delete all other conversations and clear the current one. This action cannot be undone.</string>
+    <string name="cancel">Cancel</string>
+    <string name="custom_response">%d. Custom response…</string>
+    <string name="type_your_answer">Type your answer…</string>
+    <string name="describe_changes">Describe what to change…</string>
+    <string name="approve_manual">Approve (Manual Approval)</string>
+    <string name="approve_auto">Approve (Auto-Execute)</string>
+    <string name="tasks_count">Tasks (%d)</string>
+    <string name="working">Working…</string>
+    <string name="thinking">Thinking…</string>
+    <string name="executing">Executing: %s</string>
+    <string name="waiting_approval">Waiting for approval: %s</string>
+    <string name="empty_state_subtitle">Your AI phone agent. Tell me what to do.</string>
+    <string name="logs_title">Agent Logs</string>
+    <string name="entries_count">%d entries</string>
+    <string name="no_logs_yet">No logs yet. Send a message to see agent activity.</string>
+
+    <!-- Settings Screen -->
+    <string name="section_ai_model">AI Model</string>
+    <string name="section_api_key">API Key</string>
+    <string name="section_network">Network</string>
+    <string name="section_agent">Agent</string>
+    <string name="section_assistant">Assistant</string>
+    <string name="section_voice">Voice</string>
+    <string name="section_permissions">Permissions</string>
+    <string name="section_language">Language</string>
+    <string name="section_about">About</string>
+    <string name="section_debug">Debug</string>
+    <string name="provider">Provider</string>
+    <string name="model">Model</string>
+    <string name="configure_api_key">Configure API Key</string>
+    <string name="encrypted_with_tink">Encrypted with Google Tink</string>
+    <string name="base_url">Base URL</string>
+    <string name="base_url_placeholder">Default (auto per provider)</string>
+    <string name="save_base_url">Save Base URL</string>
+    <string name="http_proxy">HTTP Proxy</string>
+    <string name="proxy_placeholder">e.g. 127.0.0.1:7890</string>
+    <string name="save_proxy">Save Proxy</string>
+    <string name="streaming">Streaming</string>
+    <string name="streaming_on">Stream responses in real-time</string>
+    <string name="streaming_off">Wait for complete response</string>
+    <string name="max_iterations">Max Iterations</string>
+    <string name="per_turn">%d per turn</string>
+    <string name="thinking_mode">Thinking Mode</string>
+    <string name="thinking_mode_on">Extended thinking enabled</string>
+    <string name="thinking_mode_off">Direct responses only</string>
+    <string name="agent_instructions">Agent Instructions &amp; Memory</string>
+    <string name="agent_instructions_desc">Edit agent instructions and view AI memory</string>
+    <string name="set_default_assistant">Set as Default Assistant</string>
+    <string name="set_default_assistant_desc">Make FoxTouch the system digital assistant</string>
+    <string name="tts_title">Text-to-Speech</string>
+    <string name="tts_desc">Read assistant responses aloud</string>
+    <string name="speech_rate">Speech Rate</string>
+    <string name="a11y_service">Accessibility Service</string>
+    <string name="a11y_connected">Connected</string>
+    <string name="a11y_not_connected">Not connected - tap to enable</string>
+    <string name="overlay_permission">Overlay Permission</string>
+    <string name="overlay_granted">Granted</string>
+    <string name="overlay_not_granted">Not granted - tap to enable</string>
+    <string name="floating_overlay">Floating Overlay</string>
+    <string name="overlay_on_desc">Shows status bubble during agent execution</string>
+    <string name="overlay_off_desc">Overlay hidden — agent works silently in background</string>
+    <string name="tool_permissions">Tool Permissions</string>
+    <string name="tool_permissions_desc">Configure per-tool approval policy</string>
+    <string name="tool_permissions_info">Configure which tools require approval before execution.</string>
+    <string name="tool_permissions_hint">You can change tool permissions when the agent asks for approval by tapping \'Always Allow This Tool\'.</string>
+    <string name="enhanced_screenshot">Enhanced Screenshot</string>
+    <string name="enhanced_screenshot_desc">Use MediaProjection for apps that block accessibility screenshots (e.g., WeChat)</string>
+    <string name="enhanced_screenshot_grant">Grant screen capture permission first</string>
+    <string name="enhanced_screenshot_apps">Enhanced Screenshot Apps</string>
+    <string name="enhanced_screenshot_apps_desc">Select apps that need MediaProjection-based screenshot</string>
+    <string name="enhanced_screenshot_add">Add App</string>
+    <string name="enhanced_screenshot_none">No apps configured. Tap \"Add App\" to select apps that block normal screenshots.</string>
+    <string name="enhanced_screenshot_authorized">Screen capture authorized</string>
+    <string name="enhanced_screenshot_not_authorized">Tap to grant screen capture permission</string>
+    <string name="yolo_warning_title">YOLO Mode Warning</string>
+    <string name="yolo_warning_desc">When YOLO mode is active, the AI will execute ALL actions (clicks, typing, swipes, app launches) without asking for approval. Use at your own risk. You can switch modes using the toggle button in the chat screen.</string>
+    <string name="app_language">App Language</string>
+    <string name="system_default">System Default</string>
+    <string name="about_version">FoxTouch v0.1.0</string>
+    <string name="about_desc">AI Phone Agent</string>
+    <string name="about_desc_debug">AI Phone Agent (Debug mode enabled)</string>
+    <string name="json_display_mode">JSON Display Mode</string>
+    <string name="json_display_desc">Show raw JSON in tool calls and approval dialogs</string>
+    <string name="preview_device_context">Preview Device Context</string>
+    <string name="preview_device_context_desc">View what info the AI receives about your device</string>
+    <string name="disable_debug">Disable Debug Mode</string>
+    <string name="disable_debug_desc">Hide debug options</string>
+    <string name="device_context_title">Device Context Preview</string>
+    <string name="device_context_desc">This is the device information injected into the AI\'s system prompt:</string>
+    <string name="api_key_label">API Key</string>
+    <string name="save">Save</string>
+    <string name="close">Close</string>
+    <string name="ok">OK</string>
+    <string name="back">Back</string>
+
+    <!-- Voice -->
+    <string name="voice_listening">Listening…</string>
+    <string name="voice_speak">Speak</string>
+    <string name="tts_on">TTS On</string>
+    <string name="tts_off">TTS Off</string>
+    <string name="voice_unavailable_title">Speech Recognition Unavailable</string>
+    <string name="voice_unavailable_message">Speech recognition is not available on this device. Please install or enable the Google app to use voice input.</string>
+    <string name="install_google_app">Install Google App</string>
+
+    <!-- Confirm Completion -->
+    <string name="completion_title">Task Complete?</string>
+    <string name="completion_confirmed">Completed</string>
+    <string name="completion_not_done">Not Done</string>
+    <string name="completion_reason_hint">What still needs to be done?</string>
+
+    <!-- Skills -->
+    <string name="save_as_skill">Save as Skill</string>
+
+    <!-- Custom Model -->
+    <string name="custom_model">Custom Model</string>
+    <string name="custom_model_hint">Enter model name (e.g. gpt-4o)</string>
+    <string name="custom_model_option">Custom model…</string>
+
+    <!-- Provider Management -->
+    <string name="key_configured">API key configured</string>
+    <string name="key_not_configured">API key not set</string>
+    <string name="model_fetch_retry">Retry</string>
+    <string name="api_key_unchanged_hint">Leave blank to keep current key</string>
+</resources>

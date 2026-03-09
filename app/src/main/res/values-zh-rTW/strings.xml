@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="a11y_service_description">FoxTouch 使用無障礙服務讀取螢幕內容並代您執行操作。它會擷取介面元素樹和截圖，幫助 AI 助手理解並操控您的手機。</string>
+
+    <!-- Chat -->
+    <string name="chat_input_hint">告訴 FoxTouch 你想做什麼…</string>
+    <string name="send">傳送</string>
+    <string name="new_chat">新對話</string>
+    <string name="clear_chat">清空對話</string>
+    <string name="copy">複製</string>
+    <string name="agent_logs">Agent 日誌</string>
+    <string name="stop">停止</string>
+    <string name="error_prefix">錯誤：%s</string>
+    <string name="dismiss">關閉</string>
+    <string name="no_messages_yet">暫無訊息</string>
+
+    <!-- Agent State Labels -->
+    <string name="state_idle">閒置</string>
+    <string name="state_thinking">思考中…</string>
+    <string name="state_acting">執行中：%s</string>
+    <string name="state_needs_approval">需要批准</string>
+    <string name="state_plan_ready">計畫就緒</string>
+    <string name="state_asking_user">有問題要問你</string>
+    <string name="state_error">出錯了</string>
+
+    <!-- Setup -->
+    <string name="setup_welcome_title">歡迎使用 FoxTouch</string>
+    <string name="setup_welcome_desc">你的 AI 手機助手。告訴它你想做什麼，它會替你操作手機。</string>
+    <string name="setup_api_key_title">設定 LLM 提供商</string>
+    <string name="setup_api_key_desc">輸入你的 API 金鑰以連線 AI 模型。</string>
+    <string name="setup_a11y_title">啟用無障礙服務</string>
+    <string name="setup_a11y_desc">FoxTouch 需要無障礙權限來讀取和操控你的螢幕。</string>
+    <string name="setup_done_title">設定完成！</string>
+    <string name="setup_done_desc">FoxTouch 已準備就緒。開始告訴它你需要什麼吧。</string>
+
+    <!-- Permissions / Approval -->
+    <string name="approval_title">需要工具授權</string>
+    <string name="approve">允許</string>
+    <string name="deny">拒絕</string>
+    <string name="always_allow">始終允許</string>
+    <string name="always">始終</string>
+
+    <!-- Overlay -->
+    <string name="open_foxtouch">開啟 FoxTouch</string>
+    <string name="collapse">收合</string>
+    <string name="expand">展開</string>
+    <string name="type_answer_hint">輸入回答…</string>
+    <string name="plan_ready_for_review">計畫待審核</string>
+    <string name="reject">拒絕</string>
+    <string name="approve_plan">批准</string>
+    <string name="auto_mode">自動</string>
+
+    <!-- Plan Review Sheet -->
+    <string name="plan_review_title">計畫審核</string>
+    <string name="plan_review_desc">AI 已產生操作計畫。請審核並選擇執行方式：</string>
+    <string name="execute_plan">執行計畫</string>
+    <string name="execute_auto">自動執行</string>
+    <string name="reject_plan">拒絕計畫</string>
+    <string name="request_modification">要求修改</string>
+    <string name="modification_hint">需要修改什麼？</string>
+
+    <!-- User Question Sheet -->
+    <string name="foxtouch_asks">FoxTouch 問你：</string>
+    <string name="your_answer_hint">你的回答…</string>
+    <string name="submit">提交</string>
+
+    <!-- Settings -->
+    <string name="settings_title">設定</string>
+    <string name="settings_api_key">API 金鑰</string>
+    <string name="settings_provider">LLM 提供商</string>
+    <string name="settings_model">模型</string>
+    <string name="settings_permissions">工具權限</string>
+    <string name="settings_about">關於</string>
+    <string name="settings_overlay">顯示懸浮視窗</string>
+    <string name="settings_debug_mode">除錯模式</string>
+    <string name="settings_streaming">串流傳輸</string>
+    <string name="settings_proxy">HTTP 代理</string>
+    <string name="settings_base_url">自訂 Base URL</string>
+
+    <!-- Agent Mode -->
+    <string name="mode_normal">普通</string>
+    <string name="mode_plan">計畫</string>
+    <string name="mode_yolo">自動</string>
+
+    <!-- Tasks -->
+    <string name="tasks_title">任務</string>
+    <string name="task_completed">已完成</string>
+    <string name="task_in_progress">進行中</string>
+    <string name="task_failed">失敗</string>
+    <string name="task_pending">待處理</string>
+
+    <!-- Sessions -->
+    <string name="sessions_title">工作階段</string>
+    <string name="delete_session">刪除</string>
+    <string name="untitled_session">未命名</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_overlay">FoxTouch 懸浮視窗</string>
+    <string name="notification_channel_agent">FoxTouch Agent</string>
+    <string name="notification_tap_to_open">點擊開啟</string>
+    <string name="notification_waiting_answer">等待你的回答…</string>
+    <string name="notification_plan_review">計畫待審核</string>
+
+    <!-- Voice -->
+    <string name="voice_listening">正在聆聽…</string>
+    <string name="voice_speak">說話</string>
+    <string name="tts_on">語音已開</string>
+    <string name="tts_off">語音已關</string>
+</resources>
