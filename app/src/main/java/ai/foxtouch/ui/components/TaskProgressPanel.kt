@@ -37,8 +37,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import ai.foxtouch.R
 import ai.foxtouch.data.db.entity.TaskEntity
 import ai.foxtouch.ui.screens.chat.TaskProgress
 
@@ -70,12 +72,7 @@ private fun CompactTaskPanel(
     progress: TaskProgress,
     modifier: Modifier = Modifier,
 ) {
-    var expanded by remember { mutableStateOf(true) }
-    // Auto-expand when new tasks appear or any become in_progress
-    val hasInProgress = tasks.any { it.status == "in_progress" }
-    androidx.compose.runtime.LaunchedEffect(tasks.size, hasInProgress) {
-        if (tasks.isNotEmpty()) expanded = true
-    }
+    var expanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -101,7 +98,7 @@ private fun CompactTaskPanel(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "${progress.completed}/${progress.total} tasks",
+                text = stringResource(R.string.tasks_progress, progress.completed, progress.total),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -119,10 +116,10 @@ private fun CompactTaskPanel(
             val currentTask = tasks.firstOrNull { it.status == "in_progress" }
             val nextTask = tasks.firstOrNull { it.status == "pending" }
             if (currentTask != null) {
-                CompactTaskLine("Now", currentTask)
+                CompactTaskLine(stringResource(R.string.task_label_now), currentTask)
             }
             if (nextTask != null) {
-                CompactTaskLine("Next", nextTask)
+                CompactTaskLine(stringResource(R.string.task_label_next), nextTask)
             }
         } else {
             tasks.forEach { task ->
@@ -192,7 +189,7 @@ private fun FullTaskPanel(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "Tasks ${progress.completed}/${progress.total}",
+                    text = stringResource(R.string.tasks_progress, progress.completed, progress.total),
                     style = MaterialTheme.typography.labelLarge,
                 )
                 Spacer(Modifier.weight(1f))
@@ -205,7 +202,7 @@ private fun FullTaskPanel(
                 }
                 Icon(
                     if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (expanded) "Collapse" else "Expand",
+                    contentDescription = stringResource(if (expanded) R.string.collapse else R.string.expand),
                     modifier = Modifier.size(20.dp),
                 )
             }

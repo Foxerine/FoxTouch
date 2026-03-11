@@ -21,6 +21,7 @@
     <string name="state_needs_approval">Perlu kelulusan</string>
     <string name="state_plan_ready">Rancangan sedia</string>
     <string name="state_asking_user">Ada soalan untuk anda</string>
+    <string name="state_confirming_completion">Tugasan selesai?</string>
     <string name="state_error">Ralat</string>
 
     <!-- Setup -->
@@ -88,6 +89,9 @@
     <string name="task_in_progress">sedang berjalan</string>
     <string name="task_failed">gagal</string>
     <string name="task_pending">menunggu</string>
+    <string name="tasks_progress">%1$d/%2$d tugasan</string>
+    <string name="task_label_now">Semasa</string>
+    <string name="task_label_next">Seterusnya</string>
 
     <!-- Sessions -->
     <string name="sessions_title">Sesi</string>
@@ -101,9 +105,169 @@
     <string name="notification_waiting_answer">Menunggu jawapan anda…</string>
     <string name="notification_plan_review">Rancangan sedia untuk semakan</string>
 
+    <!-- Chat Screen -->
+    <string name="chat_history">Sejarah sembang</string>
+    <string name="delete_all">Padam semua</string>
+    <string name="delete_all_title">Padam semua perbualan</string>
+    <string name="delete_all_message">Ini akan memadam semua perbualan lain dan mengosongkan yang semasa. Tindakan ini tidak boleh dibatalkan.</string>
+    <string name="cancel">Batal</string>
+    <string name="custom_response">%d. Jawapan tersuai…</string>
+    <string name="type_your_answer">Taip jawapan anda…</string>
+    <string name="describe_changes">Terangkan apa yang perlu diubah…</string>
+    <string name="approve_manual">Luluskan (kelulusan manual)</string>
+    <string name="approve_auto">Luluskan (pelaksanaan automatik)</string>
+    <string name="tasks_count">Tugasan (%d)</string>
+    <string name="working">Bekerja…</string>
+    <string name="thinking">Berfikir…</string>
+    <string name="executing">Melaksanakan: %s</string>
+    <string name="waiting_approval">Menunggu kelulusan: %s</string>
+    <string name="empty_state_subtitle">Ejen telefon AI anda. Beritahu saya apa yang perlu dilakukan.</string>
+    <string name="logs_title">Log ejen</string>
+    <string name="entries_count">%d entri</string>
+    <string name="no_logs_yet">Tiada log lagi. Hantar mesej untuk melihat aktiviti ejen.</string>
+
+    <!-- Settings Screen -->
+    <string name="section_ai_model">Model AI</string>
+    <string name="section_api_key">Kunci API</string>
+    <string name="section_network">Rangkaian</string>
+    <string name="section_agent">Ejen</string>
+    <string name="section_assistant">Pembantu</string>
+    <string name="section_voice">Suara</string>
+    <string name="section_permissions">Kebenaran</string>
+    <string name="section_language">Bahasa</string>
+    <string name="section_about">Perihal</string>
+    <string name="section_debug">Nyahpepijat</string>
+    <string name="provider">Penyedia</string>
+    <string name="model">Model</string>
+    <string name="configure_api_key">Konfigurasi kunci API</string>
+    <string name="encrypted_with_tink">Disulitkan dengan Google Tink</string>
+    <string name="base_url">URL asas</string>
+    <string name="base_url_placeholder">Lalai (automatik mengikut penyedia)</string>
+    <string name="save_base_url">Simpan URL asas</string>
+    <string name="http_proxy">Proksi HTTP</string>
+    <string name="proxy_placeholder">cth. 127.0.0.1:7890</string>
+    <string name="save_proxy">Simpan proksi</string>
+    <string name="streaming">Penstriman</string>
+    <string name="streaming_on">Strim respons masa nyata</string>
+    <string name="streaming_off">Tunggu respons lengkap</string>
+    <string name="max_iterations">Bilangan iterasi maksimum</string>
+    <string name="per_turn">%d setiap giliran</string>
+    <string name="thinking_mode">Mod pemikiran</string>
+    <string name="thinking_mode_on">Pemikiran lanjutan diaktifkan</string>
+    <string name="thinking_mode_off">Respons terus sahaja</string>
+    <string name="agent_instructions">Arahan ejen &amp; memori</string>
+    <string name="agent_instructions_desc">Edit arahan ejen dan lihat memori AI</string>
+    <string name="set_default_assistant">Tetapkan sebagai pembantu lalai</string>
+    <string name="set_default_assistant_desc">Jadikan FoxTouch sebagai pembantu digital sistem</string>
+    <string name="tts_title">Teks ke suara</string>
+    <string name="tts_desc">Baca respons pembantu dengan kuat</string>
+    <string name="speech_rate">Kelajuan pertuturan</string>
+    <string name="a11y_service">Perkhidmatan kebolehcapaian</string>
+    <string name="a11y_connected">Disambungkan</string>
+    <string name="a11y_not_connected">Tidak disambungkan - ketik untuk aktifkan</string>
+    <string name="overlay_permission">Kebenaran tindanan</string>
+    <string name="overlay_granted">Diberikan</string>
+    <string name="overlay_not_granted">Tidak diberikan - ketik untuk aktifkan</string>
+    <string name="floating_overlay">Tindanan terapung</string>
+    <string name="overlay_on_desc">Papar gelembung status semasa pelaksanaan ejen</string>
+    <string name="overlay_off_desc">Tindanan tersembunyi — ejen bekerja senyap di latar belakang</string>
+    <string name="tool_permissions">Kebenaran alat</string>
+    <string name="tool_permissions_desc">Konfigurasi dasar kelulusan setiap alat</string>
+    <string name="tool_permissions_info">Konfigurasi alat mana yang memerlukan kelulusan sebelum pelaksanaan.</string>
+    <string name="tool_permissions_hint">Anda boleh menukar kebenaran alat apabila ejen meminta kelulusan dengan mengetik \'Sentiasa Benarkan Alat Ini\'.</string>
+    <string name="ime_service">Kaedah input FoxTouch</string>
+    <string name="ime_enabled">Diaktifkan</string>
+    <string name="ime_not_enabled">Tidak diaktifkan - ketik untuk aktifkan</string>
+    <string name="ime_desc">Membolehkan input teks dan akses papan keratan yang boleh dipercayai merentas semua aplikasi</string>
+    <string name="enhanced_screenshot">Tangkapan skrin dipertingkat</string>
+    <string name="enhanced_screenshot_desc">Guna MediaProjection untuk aplikasi yang menyekat tangkapan skrin kebolehcapaian (cth. WeChat)</string>
+    <string name="enhanced_screenshot_grant">Berikan kebenaran tangkapan skrin terlebih dahulu</string>
+    <string name="enhanced_screenshot_apps">Aplikasi tangkapan skrin dipertingkat</string>
+    <string name="enhanced_screenshot_apps_desc">Pilih aplikasi yang memerlukan tangkapan skrin berasaskan MediaProjection</string>
+    <string name="enhanced_screenshot_add">Tambah aplikasi</string>
+    <string name="enhanced_screenshot_none">Tiada aplikasi dikonfigurasi. Ketik \"Tambah aplikasi\" untuk memilih aplikasi yang menyekat tangkapan skrin biasa.</string>
+    <string name="enhanced_screenshot_authorized">Tangkapan skrin dibenarkan</string>
+    <string name="enhanced_screenshot_not_authorized">Ketik untuk berikan kebenaran tangkapan skrin</string>
+    <string name="yolo_warning_title">Amaran mod YOLO</string>
+    <string name="yolo_warning_desc">Apabila mod YOLO aktif, AI akan melaksanakan SEMUA tindakan (ketik, taip, leret, lancarkan aplikasi) tanpa meminta kelulusan. Guna atas risiko sendiri. Anda boleh menukar mod menggunakan butang togol di skrin sembang.</string>
+    <string name="app_language">Bahasa aplikasi</string>
+    <string name="system_default">Lalai sistem</string>
+    <string name="about_version">FoxTouch v0.1.0</string>
+    <string name="about_desc">Ejen telefon AI</string>
+    <string name="about_desc_debug">Ejen telefon AI (mod nyahpepijat diaktifkan)</string>
+    <string name="json_display_mode">Mod paparan JSON</string>
+    <string name="json_display_desc">Papar JSON mentah dalam panggilan alat dan dialog kelulusan</string>
+    <string name="preview_device_context">Pratonton konteks peranti</string>
+    <string name="preview_device_context_desc">Lihat maklumat peranti yang diterima oleh AI</string>
+    <string name="disable_debug">Nyahaktifkan mod nyahpepijat</string>
+    <string name="disable_debug_desc">Sembunyikan pilihan nyahpepijat</string>
+    <string name="device_context_title">Pratonton konteks peranti</string>
+    <string name="device_context_desc">Ini adalah maklumat peranti yang disuntik ke dalam prompt sistem AI:</string>
+    <string name="api_key_label">Kunci API</string>
+    <string name="save">Simpan</string>
+    <string name="close">Tutup</string>
+    <string name="ok">OK</string>
+    <string name="back">Kembali</string>
+
     <!-- Voice -->
     <string name="voice_listening">Mendengar…</string>
     <string name="voice_speak">Bercakap</string>
     <string name="tts_on">Suara dihidupkan</string>
     <string name="tts_off">Suara dimatikan</string>
+    <string name="voice_unavailable_title">Pengecaman suara tidak tersedia</string>
+    <string name="voice_unavailable_message">Pengecaman suara tidak tersedia pada peranti ini. Sila pasang atau aktifkan aplikasi Google untuk menggunakan input suara.</string>
+    <string name="install_google_app">Pasang aplikasi Google</string>
+
+    <!-- Confirm Completion -->
+    <string name="completion_title">Tugasan selesai?</string>
+    <string name="completion_confirmed">Selesai</string>
+    <string name="completion_not_done">Belum selesai</string>
+    <string name="completion_reason_hint">Apa yang masih perlu dilakukan?</string>
+
+    <!-- Skills -->
+    <string name="save_as_skill">Simpan sebagai kemahiran</string>
+    <string name="skills_title">Kemahiran</string>
+    <string name="skills_desc">Urus pelan tindakan boleh guna semula</string>
+    <string name="no_skills_yet">Tiada kemahiran lagi. Kemahiran disimpan dari rancangan yang diluluskan.</string>
+    <string name="edit_skill">Edit kemahiran</string>
+    <string name="new_skill">Kemahiran baharu</string>
+    <string name="skill_title_label">Tajuk</string>
+    <string name="skill_content_label">Kandungan (Markdown)</string>
+    <string name="delete_skill">Padam kemahiran</string>
+    <string name="delete_skill_confirm">Padam kemahiran ini? Tindakan ini tidak boleh dibatalkan.</string>
+
+    <!-- Compact -->
+    <string name="compact_threshold">Ambang pemampatan</string>
+    <string name="compact_threshold_desc">Mampatkan perbualan secara automatik pada kiraan token ini</string>
+    <string name="compact_model">Model pemampatan</string>
+    <string name="compact_model_desc">Model yang digunakan untuk ringkasan</string>
+    <string name="compact_model_placeholder">Guna model semasa</string>
+    <string name="compact_prompt">Prompt pemampatan</string>
+    <string name="compact_prompt_desc">Suaikan prompt ringkasan</string>
+    <string name="reset_to_default">Set semula ke lalai</string>
+    <string name="compact_warning">%d%% lagi sebelum auto-mampat</string>
+    <string name="auto_delete_tasks">Padam tugasan secara automatik apabila selesai</string>
+    <string name="auto_delete_tasks_desc">Padam semua subtugasan apabila pengguna mengesahkan penyelesaian</string>
+    <string name="context_compacted">Konteks dimampatkan — perbualan diringkaskan untuk kekal dalam had token.</string>
+
+    <!-- Context Window -->
+    <string name="context_window">Tetingkap konteks</string>
+    <string name="context_window_auto">Auto (%1$s)</string>
+    <string name="context_window_input_hint">Masukkan kiraan token (cth. 128000)</string>
+    <string name="custom_value">Nilai tersuai…</string>
+
+    <!-- Custom Model -->
+    <string name="custom_model">Model tersuai</string>
+    <string name="custom_model_hint">Masukkan nama model (cth. gpt-4o)</string>
+    <string name="custom_model_option">Model tersuai…</string>
+
+    <!-- Provider Management -->
+    <string name="key_configured">Kunci API dikonfigurasi</string>
+    <string name="key_not_configured">Kunci API tidak ditetapkan</string>
+    <string name="model_fetch_retry">Cuba semula</string>
+    <string name="api_key_unchanged_hint">Biarkan kosong untuk mengekalkan kunci semasa</string>
+
+    <!-- URL Validation -->
+    <string name="url_invalid">Format URL tidak sah</string>
+    <string name="url_add_https">Tambah https://</string>
 </resources>

@@ -21,6 +21,7 @@
     <string name="state_needs_approval">承認が必要</string>
     <string name="state_plan_ready">プラン準備完了</string>
     <string name="state_asking_user">質問があります</string>
+    <string name="state_confirming_completion">タスク完了？</string>
     <string name="state_error">エラー</string>
 
     <!-- Setup -->
@@ -88,6 +89,9 @@
     <string name="task_in_progress">実行中</string>
     <string name="task_failed">失敗</string>
     <string name="task_pending">保留中</string>
+    <string name="tasks_progress">%1$d/%2$d タスク</string>
+    <string name="task_label_now">現在</string>
+    <string name="task_label_next">次</string>
 
     <!-- Sessions -->
     <string name="sessions_title">セッション</string>
@@ -101,9 +105,169 @@
     <string name="notification_waiting_answer">回答をお待ちしています…</string>
     <string name="notification_plan_review">プラン確認待ち</string>
 
+    <!-- Chat Screen -->
+    <string name="chat_history">チャット履歴</string>
+    <string name="delete_all">すべて削除</string>
+    <string name="delete_all_title">すべての会話を削除</string>
+    <string name="delete_all_message">他のすべての会話を削除し、現在の会話をクリアします。この操作は元に戻せません。</string>
+    <string name="cancel">キャンセル</string>
+    <string name="custom_response">%d. カスタム回答…</string>
+    <string name="type_your_answer">回答を入力…</string>
+    <string name="describe_changes">変更内容を記述…</string>
+    <string name="approve_manual">承認（手動承認）</string>
+    <string name="approve_auto">承認（自動実行）</string>
+    <string name="tasks_count">タスク（%d）</string>
+    <string name="working">作業中…</string>
+    <string name="thinking">考え中…</string>
+    <string name="executing">実行中：%s</string>
+    <string name="waiting_approval">承認待ち：%s</string>
+    <string name="empty_state_subtitle">AIスマホエージェント。何をしてほしいか伝えてください。</string>
+    <string name="logs_title">エージェントログ</string>
+    <string name="entries_count">%d 件</string>
+    <string name="no_logs_yet">ログはまだありません。メッセージを送信してエージェントの活動を確認してください。</string>
+
+    <!-- Settings Screen -->
+    <string name="section_ai_model">AIモデル</string>
+    <string name="section_api_key">APIキー</string>
+    <string name="section_network">ネットワーク</string>
+    <string name="section_agent">エージェント</string>
+    <string name="section_assistant">アシスタント</string>
+    <string name="section_voice">音声</string>
+    <string name="section_permissions">権限</string>
+    <string name="section_language">言語</string>
+    <string name="section_about">情報</string>
+    <string name="section_debug">デバッグ</string>
+    <string name="provider">プロバイダー</string>
+    <string name="model">モデル</string>
+    <string name="configure_api_key">APIキーを設定</string>
+    <string name="encrypted_with_tink">Google Tinkで暗号化</string>
+    <string name="base_url">Base URL</string>
+    <string name="base_url_placeholder">デフォルト（プロバイダーに応じて自動）</string>
+    <string name="save_base_url">Base URLを保存</string>
+    <string name="http_proxy">HTTPプロキシ</string>
+    <string name="proxy_placeholder">例：127.0.0.1:7890</string>
+    <string name="save_proxy">プロキシを保存</string>
+    <string name="streaming">ストリーミング</string>
+    <string name="streaming_on">リアルタイムストリーミング</string>
+    <string name="streaming_off">完全な応答を待つ</string>
+    <string name="max_iterations">最大イテレーション数</string>
+    <string name="per_turn">1ターンあたり%d回</string>
+    <string name="thinking_mode">思考モード</string>
+    <string name="thinking_mode_on">拡張思考を有効化</string>
+    <string name="thinking_mode_off">直接応答のみ</string>
+    <string name="agent_instructions">エージェント指示とメモリ</string>
+    <string name="agent_instructions_desc">エージェント指示を編集し、AIメモリを表示</string>
+    <string name="set_default_assistant">デフォルトアシスタントに設定</string>
+    <string name="set_default_assistant_desc">FoxTouch をシステムデジタルアシスタントに設定</string>
+    <string name="tts_title">テキスト読み上げ</string>
+    <string name="tts_desc">アシスタントの応答を読み上げ</string>
+    <string name="speech_rate">読み上げ速度</string>
+    <string name="a11y_service">アクセシビリティサービス</string>
+    <string name="a11y_connected">接続済み</string>
+    <string name="a11y_not_connected">未接続 - タップして有効化</string>
+    <string name="overlay_permission">オーバーレイ権限</string>
+    <string name="overlay_granted">許可済み</string>
+    <string name="overlay_not_granted">未許可 - タップして有効化</string>
+    <string name="floating_overlay">フローティングオーバーレイ</string>
+    <string name="overlay_on_desc">エージェント実行中にステータスバブルを表示</string>
+    <string name="overlay_off_desc">オーバーレイ非表示 — エージェントはバックグラウンドで動作</string>
+    <string name="tool_permissions">ツール権限</string>
+    <string name="tool_permissions_desc">ツールごとの承認ポリシーを設定</string>
+    <string name="tool_permissions_info">実行前に承認が必要なツールを設定します。</string>
+    <string name="tool_permissions_hint">エージェントが承認を求めるとき、「このツールを常に許可」をタップして権限を変更できます。</string>
+    <string name="ime_service">FoxTouch 入力方式</string>
+    <string name="ime_enabled">有効</string>
+    <string name="ime_not_enabled">無効 - タップして有効化</string>
+    <string name="ime_desc">すべてのアプリで確実なテキスト入力とクリップボードアクセスを実現</string>
+    <string name="enhanced_screenshot">拡張スクリーンショット</string>
+    <string name="enhanced_screenshot_desc">アクセシビリティスクリーンショットをブロックするアプリにMediaProjectionを使用（例：WeChat）</string>
+    <string name="enhanced_screenshot_grant">先に画面キャプチャ権限を付与してください</string>
+    <string name="enhanced_screenshot_apps">拡張スクリーンショット対象アプリ</string>
+    <string name="enhanced_screenshot_apps_desc">MediaProjectionベースのスクリーンショットが必要なアプリを選択</string>
+    <string name="enhanced_screenshot_add">アプリを追加</string>
+    <string name="enhanced_screenshot_none">アプリが設定されていません。「アプリを追加」をタップして通常のスクリーンショットをブロックするアプリを選択してください。</string>
+    <string name="enhanced_screenshot_authorized">画面キャプチャ許可済み</string>
+    <string name="enhanced_screenshot_not_authorized">タップして画面キャプチャ権限を付与</string>
+    <string name="yolo_warning_title">YOLOモード警告</string>
+    <string name="yolo_warning_desc">YOLOモードが有効な場合、AIは承認なしにすべての操作（タップ、入力、スワイプ、アプリ起動）を実行します。自己責任でご利用ください。チャット画面の切り替えボタンでモードを変更できます。</string>
+    <string name="app_language">アプリの言語</string>
+    <string name="system_default">システムのデフォルト</string>
+    <string name="about_version">FoxTouch v0.1.0</string>
+    <string name="about_desc">AIスマホエージェント</string>
+    <string name="about_desc_debug">AIスマホエージェント（デバッグモード有効）</string>
+    <string name="json_display_mode">JSON表示モード</string>
+    <string name="json_display_desc">ツール呼び出しと承認ダイアログで生のJSONを表示</string>
+    <string name="preview_device_context">デバイスコンテキストのプレビュー</string>
+    <string name="preview_device_context_desc">AIが受信するデバイス情報を表示</string>
+    <string name="disable_debug">デバッグモードを無効化</string>
+    <string name="disable_debug_desc">デバッグオプションを非表示</string>
+    <string name="device_context_title">デバイスコンテキストプレビュー</string>
+    <string name="device_context_desc">AIのシステムプロンプトに注入されるデバイス情報：</string>
+    <string name="api_key_label">APIキー</string>
+    <string name="save">保存</string>
+    <string name="close">閉じる</string>
+    <string name="ok">OK</string>
+    <string name="back">戻る</string>
+
     <!-- Voice -->
     <string name="voice_listening">聞いています…</string>
     <string name="voice_speak">話す</string>
     <string name="tts_on">音声オン</string>
     <string name="tts_off">音声オフ</string>
+    <string name="voice_unavailable_title">音声認識が利用できません</string>
+    <string name="voice_unavailable_message">このデバイスでは音声認識が利用できません。音声入力を使用するにはGoogleアプリをインストールまたは有効にしてください。</string>
+    <string name="install_google_app">Googleアプリをインストール</string>
+
+    <!-- Confirm Completion -->
+    <string name="completion_title">タスク完了？</string>
+    <string name="completion_confirmed">完了</string>
+    <string name="completion_not_done">未完了</string>
+    <string name="completion_reason_hint">まだ何が必要ですか？</string>
+
+    <!-- Skills -->
+    <string name="save_as_skill">スキルとして保存</string>
+    <string name="skills_title">スキル</string>
+    <string name="skills_desc">再利用可能なアクションプランを管理</string>
+    <string name="no_skills_yet">スキルはまだありません。承認されたプランから保存されます。</string>
+    <string name="edit_skill">スキルを編集</string>
+    <string name="new_skill">新規スキル</string>
+    <string name="skill_title_label">タイトル</string>
+    <string name="skill_content_label">内容（Markdown）</string>
+    <string name="delete_skill">スキルを削除</string>
+    <string name="delete_skill_confirm">このスキルを削除しますか？元に戻せません。</string>
+
+    <!-- Compact -->
+    <string name="compact_threshold">圧縮しきい値</string>
+    <string name="compact_threshold_desc">このトークン数で会話を自動圧縮</string>
+    <string name="compact_model">圧縮モデル</string>
+    <string name="compact_model_desc">要約に使用するモデル</string>
+    <string name="compact_model_placeholder">現在のモデルを使用</string>
+    <string name="compact_prompt">圧縮プロンプト</string>
+    <string name="compact_prompt_desc">要約プロンプトをカスタマイズ</string>
+    <string name="reset_to_default">デフォルトに戻す</string>
+    <string name="compact_warning">自動圧縮まで残り%d%%</string>
+    <string name="auto_delete_tasks">完了時にタスクを自動削除</string>
+    <string name="auto_delete_tasks_desc">ユーザーが完了を確認したらすべてのサブタスクを削除</string>
+    <string name="context_compacted">コンテキストが圧縮されました — トークン制限内に収めるため会話が要約されました。</string>
+
+    <!-- Context Window -->
+    <string name="context_window">コンテキストウィンドウ</string>
+    <string name="context_window_auto">自動（%1$s）</string>
+    <string name="context_window_input_hint">トークン数を入力（例：128000）</string>
+    <string name="custom_value">カスタム値…</string>
+
+    <!-- Custom Model -->
+    <string name="custom_model">カスタムモデル</string>
+    <string name="custom_model_hint">モデル名を入力（例：gpt-4o）</string>
+    <string name="custom_model_option">カスタムモデル…</string>
+
+    <!-- Provider Management -->
+    <string name="key_configured">APIキー設定済み</string>
+    <string name="key_not_configured">APIキー未設定</string>
+    <string name="model_fetch_retry">再試行</string>
+    <string name="api_key_unchanged_hint">現在のキーを保持するには空欄のまま</string>
+
+    <!-- URL Validation -->
+    <string name="url_invalid">URL形式が無効です</string>
+    <string name="url_add_https">https:// を追加</string>
 </resources>

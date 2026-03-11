@@ -122,6 +122,7 @@ fun ChatScreen(
     val sessionTasks by viewModel.sessionTasks.collectAsState()
     val taskProgress by viewModel.taskProgress.collectAsState()
     val logs by viewModel.logs.collectAsState()
+    val contextUsagePercent by viewModel.contextUsagePercent.collectAsState()
     val isDebugJson by viewModel.isDebugJsonDisplay.collectAsState()
     val isDebugMode by viewModel.isDebugMode.collectAsState()
     val inputText = uiState.inputDraft
@@ -262,6 +263,15 @@ fun ChatScreen(
                         }
                     },
                     actions = {
+                        if (contextUsagePercent != null && contextUsagePercent!! <= 15) {
+                            Text(
+                                text = stringResource(R.string.compact_warning, contextUsagePercent!!),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.error,
+                                maxLines = 1,
+                            )
+                            Spacer(Modifier.width(4.dp))
+                        }
                         IconButton(onClick = { viewModel.toggleTts() }) {
                             Icon(
                                 if (isTtsEnabled) Icons.AutoMirrored.Filled.VolumeUp else Icons.AutoMirrored.Filled.VolumeOff,
@@ -516,8 +526,11 @@ private fun SessionDrawer(
                             )
                             val sizeBytes = sessionSizes[session.id] ?: 0L
                             val sizeText = if (sizeBytes > 0) " · ${formatFileSize(sizeBytes)}" else ""
+                            val tokenText = if (session.lastTokenCount > 0) {
+                                " · ${formatTokenCount(session.lastTokenCount)}"
+                            } else ""
                             Text(
-                                text = "${session.provider} / ${session.model}$sizeText",
+                                text = "${session.provider} / ${session.model}$tokenText$sizeText",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -541,6 +554,12 @@ private fun formatFileSize(bytes: Long): String = when {
     bytes < 1024 -> "$bytes B"
     bytes < 1024 * 1024 -> "${bytes / 1024} KB"
     else -> String.format("%.1f MB", bytes / (1024.0 * 1024.0))
+}
+
+private fun formatTokenCount(tokens: Int): String = when {
+    tokens < 1000 -> "$tokens tokens"
+    tokens < 1_000_000 -> String.format("%.1fK tokens", tokens / 1000.0)
+    else -> String.format("%.1fM tokens", tokens / 1_000_000.0)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -89,6 +89,9 @@
     <string name="task_in_progress">进行中</string>
     <string name="task_failed">失败</string>
     <string name="task_pending">待处理</string>
+    <string name="tasks_progress">%1$d/%2$d 任务</string>
+    <string name="task_label_now">当前</string>
+    <string name="task_label_next">下一个</string>
 
     <!-- Sessions -->
     <string name="sessions_title">会话</string>
@@ -210,6 +213,59 @@
 
     <!-- Skills -->
     <string name="save_as_skill">保存为技能</string>
+    <string name="skills_title">技能</string>
+    <string name="skills_desc">管理可复用的操作方案</string>
+    <string name="no_skills_yet">暂无技能。技能从已批准的方案中保存。</string>
+    <string name="edit_skill">编辑技能</string>
+    <string name="new_skill">新技能</string>
+    <string name="skill_title_label">标题</string>
+    <string name="skill_content_label">内容（Markdown）</string>
+    <string name="delete_skill">删除技能</string>
+    <string name="delete_skill_confirm">删除此技能？此操作无法撤销。</string>
+
+    <!-- Compact -->
+    <string name="compact_threshold">压缩阈值</string>
+    <string name="compact_threshold_desc">达到此 token 数时自动压缩对话</string>
+    <string name="compact_model">压缩模型</string>
+    <string name="compact_model_desc">用于摘要的模型</string>
+    <string name="compact_model_placeholder">使用当前模型</string>
+    <string name="compact_prompt">压缩提示词</string>
+    <string name="compact_prompt_desc">自定义摘要提示词</string>
+    <string name="reset_to_default">恢复默认</string>
+    <string name="compact_warning">距自动压缩还剩 %d%%</string>
+    <string name="auto_delete_tasks">完成时自动删除任务</string>
+    <string name="auto_delete_tasks_desc">用户确认完成后删除所有子任务</string>
+    <string name="context_compacted">上下文已压缩 — 对话已摘要以保持在 token 限制内。</string>
+
+    <!-- IME -->
+    <string name="ime_service">FoxTouch 输入法</string>
+    <string name="ime_enabled">已启用</string>
+    <string name="ime_not_enabled">未启用 - 点击启用</string>
+    <string name="ime_desc">在所有应用中实现可靠的文本输入和剪贴板访问</string>
+
+    <!-- Enhanced Screenshot -->
+    <string name="enhanced_screenshot">增强截图</string>
+    <string name="enhanced_screenshot_desc">对阻止无障碍截图的应用使用 MediaProjection（如微信）</string>
+    <string name="enhanced_screenshot_grant">请先授予屏幕录制权限</string>
+    <string name="enhanced_screenshot_apps">增强截图应用</string>
+    <string name="enhanced_screenshot_apps_desc">选择需要 MediaProjection 截图的应用</string>
+    <string name="enhanced_screenshot_add">添加应用</string>
+    <string name="enhanced_screenshot_none">未配置应用。点击"添加应用"选择需要增强截图的应用。</string>
+    <string name="enhanced_screenshot_authorized">已授权屏幕录制</string>
+    <string name="enhanced_screenshot_not_authorized">点击授予屏幕录制权限</string>
+
+    <!-- Context Window -->
+    <string name="context_window">上下文窗口</string>
+    <string name="context_window_auto">自动（%1$s）</string>
+    <string name="context_window_input_hint">输入 token 数量（如 128000）</string>
+    <string name="custom_value">自定义值…</string>
+
+    <!-- URL Validation -->
+    <string name="url_invalid">URL 格式无效</string>
+    <string name="url_add_https">添加 https://</string>
+
+    <!-- Provider Management -->
+    <string name="api_key_unchanged_hint">留空以保留当前密钥</string>
 
     <!-- Custom Model -->
     <string name="custom_model">自定义模型</string>

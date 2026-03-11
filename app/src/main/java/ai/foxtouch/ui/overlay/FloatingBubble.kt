@@ -66,9 +66,11 @@ class FloatingBubbleService : Service() {
     private var panelParams: WindowManager.LayoutParams? = null
 
     private var isExpanded by mutableStateOf(false)
+    private var recentMessages = mutableListOf<String>()
     private var lastMessage by mutableStateOf<String?>(null)
     /** Whether the overlay needs keyboard input (user question or plan review visible). */
     private var needsInput by mutableStateOf(false)
+    private var showCompletionSuccess by mutableStateOf(false)
     private val mainHandler = Handler(Looper.getMainLooper())
     private var stateJob: Job? = null
     private var busyJob: Job? = null
@@ -174,6 +176,7 @@ class FloatingBubbleService : Service() {
             agentRunner.isBusy.collect { busy ->
                 mainHandler.post {
                     if (busy) {
+                        recentMessages.clear()
                         lastMessage = null
                         if (!FoxTouchApp.ForegroundTracker.isForeground.value) {
                             showPanel()
@@ -191,17 +194,16 @@ class FloatingBubbleService : Service() {
         }
     }
 
-    /** Collect assistant text messages for display. */
+    /** Collect assistant text messages for display — keeps last 5 messages. */
     private fun observeMessages() {
         messageJob = applicationScope.launch {
             agentRunner.outputFlow.collect { output ->
                 if (output is AgentOutput.Text) {
-                    val preview = if (output.content.length > 100) {
-                        output.content.take(100) + "..."
-                    } else {
-                        output.content
+                    mainHandler.post {
+                        recentMessages.add(output.content)
+                        if (recentMessages.size > 5) recentMessages.removeAt(0)
+                        lastMessage = recentMessages.last()
                     }
-                    mainHandler.post { lastMessage = preview }
                 }
             }
         }
@@ -309,8 +311,15 @@ class FloatingBubbleService : Service() {
                         onUserAnswer = { answer ->
                             agentRunner.respondToUserQuestion(answer)
                         },
+                        showCompletionSuccess = showCompletionSuccess,
                         onCompletionConfirm = {
                             agentRunner.respondToCompletion(CompletionResponse.Confirmed)
+                            showCompletionSuccess = true
+                            mainHandler.postDelayed({
+                                showCompletionSuccess = false
+                                isExpanded = false
+                                hidePanel()
+                            }, 1500)
                         },
                         onCompletionReject = { reason ->
                             agentRunner.respondToCompletion(CompletionResponse.NotDone(reason))

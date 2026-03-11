@@ -22,6 +22,9 @@ interface SessionDao {
     @Query("SELECT * FROM sessions WHERE id = :id")
     suspend fun getById(id: String): SessionEntity?
 
+    @Query("SELECT * FROM sessions ORDER BY updatedAt DESC LIMIT 1")
+    suspend fun getMostRecent(): SessionEntity?
+
     @Query("DELETE FROM sessions WHERE id = :id")
     suspend fun deleteById(id: String)
 

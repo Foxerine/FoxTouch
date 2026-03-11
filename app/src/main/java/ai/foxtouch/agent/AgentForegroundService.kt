@@ -63,9 +63,8 @@ class AgentForegroundService : Service() {
         super.onCreate()
         createNotificationChannels()
         startForeground(NOTIFICATION_ID, buildStatusNotification("Working..."))
-        // Keep screen on via overlay window flag — more reliable than wake locks
-        // (SCREEN_DIM_WAKE_LOCK is deprecated and ignored by Samsung OneUI)
-        TouchAnimationOverlay.setKeepScreenOn(true)
+        // Screen keep-on is now controlled per-state in observeAgentState():
+        // ON during Thinking/Acting, OFF during blocking states (approval, ask_user, etc.)
         observeAgentState()
     }
 
@@ -102,30 +101,37 @@ class AgentForegroundService : Service() {
                     }
                     is AgentState.Thinking -> {
                         stopSelfJob?.cancel()
+                        TouchAnimationOverlay.setKeepScreenOn(true)
                         updateNotification(buildStatusNotification("Thinking..."))
                     }
                     is AgentState.Acting -> {
                         stopSelfJob?.cancel()
+                        TouchAnimationOverlay.setKeepScreenOn(true)
                         updateNotification(buildStatusNotification("Running: ${state.toolName}"))
                     }
                     is AgentState.WaitingApproval -> {
                         stopSelfJob?.cancel()
+                        TouchAnimationOverlay.setKeepScreenOn(false)
                         updateNotification(buildApprovalNotification(state))
                     }
                     is AgentState.PlanReview -> {
                         stopSelfJob?.cancel()
+                        TouchAnimationOverlay.setKeepScreenOn(false)
                         updateNotification(buildStatusNotification("Reviewing plan..."))
                     }
                     is AgentState.AskingUser -> {
                         stopSelfJob?.cancel()
+                        TouchAnimationOverlay.setKeepScreenOn(false)
                         updateNotification(buildStatusNotification("Waiting for your answer..."))
                     }
                     is AgentState.ConfirmingCompletion -> {
                         stopSelfJob?.cancel()
+                        TouchAnimationOverlay.setKeepScreenOn(false)
                         updateNotification(buildStatusNotification("Task complete?"))
                     }
                     is AgentState.Error -> {
                         stopSelfJob?.cancel()
+                        TouchAnimationOverlay.setKeepScreenOn(false)
                         updateNotification(buildStatusNotification("Error occurred"))
                     }
                 }

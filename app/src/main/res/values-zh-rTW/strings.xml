@@ -21,6 +21,7 @@
     <string name="state_needs_approval">需要批准</string>
     <string name="state_plan_ready">計畫就緒</string>
     <string name="state_asking_user">有問題要問你</string>
+    <string name="state_confirming_completion">任務完成？</string>
     <string name="state_error">出錯了</string>
 
     <!-- Setup -->
@@ -88,6 +89,9 @@
     <string name="task_in_progress">進行中</string>
     <string name="task_failed">失敗</string>
     <string name="task_pending">待處理</string>
+    <string name="tasks_progress">%1$d/%2$d 任務</string>
+    <string name="task_label_now">目前</string>
+    <string name="task_label_next">下一個</string>
 
     <!-- Sessions -->
     <string name="sessions_title">工作階段</string>
@@ -101,9 +105,169 @@
     <string name="notification_waiting_answer">等待你的回答…</string>
     <string name="notification_plan_review">計畫待審核</string>
 
+    <!-- Chat Screen -->
+    <string name="chat_history">對話歷史</string>
+    <string name="delete_all">全部刪除</string>
+    <string name="delete_all_title">刪除所有對話</string>
+    <string name="delete_all_message">這將刪除所有其他對話並清空目前的對話。此操作無法復原。</string>
+    <string name="cancel">取消</string>
+    <string name="custom_response">%d. 自訂回答…</string>
+    <string name="type_your_answer">輸入你的回答…</string>
+    <string name="describe_changes">描述需要修改的內容…</string>
+    <string name="approve_manual">批准（手動審核）</string>
+    <string name="approve_auto">批准（自動執行）</string>
+    <string name="tasks_count">任務（%d）</string>
+    <string name="working">執行中…</string>
+    <string name="thinking">思考中…</string>
+    <string name="executing">執行中：%s</string>
+    <string name="waiting_approval">等待批准：%s</string>
+    <string name="empty_state_subtitle">你的 AI 手機助手。告訴我你想做什麼。</string>
+    <string name="logs_title">Agent 日誌</string>
+    <string name="entries_count">%d 筆記錄</string>
+    <string name="no_logs_yet">暫無日誌。傳送訊息以檢視 Agent 活動。</string>
+
+    <!-- Settings Screen -->
+    <string name="section_ai_model">AI 模型</string>
+    <string name="section_api_key">API 金鑰</string>
+    <string name="section_network">網路</string>
+    <string name="section_agent">Agent</string>
+    <string name="section_assistant">助手</string>
+    <string name="section_voice">語音</string>
+    <string name="section_permissions">權限</string>
+    <string name="section_language">語言</string>
+    <string name="section_about">關於</string>
+    <string name="section_debug">除錯</string>
+    <string name="provider">提供商</string>
+    <string name="model">模型</string>
+    <string name="configure_api_key">設定 API 金鑰</string>
+    <string name="encrypted_with_tink">使用 Google Tink 加密</string>
+    <string name="base_url">Base URL</string>
+    <string name="base_url_placeholder">預設（自動匹配提供商）</string>
+    <string name="save_base_url">儲存 Base URL</string>
+    <string name="http_proxy">HTTP 代理</string>
+    <string name="proxy_placeholder">例如 127.0.0.1:7890</string>
+    <string name="save_proxy">儲存代理</string>
+    <string name="streaming">串流傳輸</string>
+    <string name="streaming_on">即時串流輸出</string>
+    <string name="streaming_off">等待完整回應</string>
+    <string name="max_iterations">最大迭代次數</string>
+    <string name="per_turn">每輪 %d 次</string>
+    <string name="thinking_mode">思考模式</string>
+    <string name="thinking_mode_on">啟用深度思考</string>
+    <string name="thinking_mode_off">僅直接回答</string>
+    <string name="agent_instructions">Agent 指令與記憶</string>
+    <string name="agent_instructions_desc">編輯 Agent 指令，檢視 AI 記憶</string>
+    <string name="set_default_assistant">設為預設助手</string>
+    <string name="set_default_assistant_desc">將 FoxTouch 設為系統數位助手</string>
+    <string name="tts_title">文字轉語音</string>
+    <string name="tts_desc">朗讀助手回覆</string>
+    <string name="speech_rate">語速</string>
+    <string name="a11y_service">無障礙服務</string>
+    <string name="a11y_connected">已連線</string>
+    <string name="a11y_not_connected">未連線 - 點擊啟用</string>
+    <string name="overlay_permission">懸浮視窗權限</string>
+    <string name="overlay_granted">已授權</string>
+    <string name="overlay_not_granted">未授權 - 點擊啟用</string>
+    <string name="floating_overlay">懸浮視窗</string>
+    <string name="overlay_on_desc">Agent 執行時顯示狀態氣泡</string>
+    <string name="overlay_off_desc">隱藏懸浮視窗 - Agent 在背景靜默工作</string>
+    <string name="tool_permissions">工具權限</string>
+    <string name="tool_permissions_desc">設定每個工具的審批策略</string>
+    <string name="tool_permissions_info">設定哪些工具在執行前需要審批。</string>
+    <string name="tool_permissions_hint">你可以在 Agent 請求批准時，點擊「始終允許此工具」來變更權限。</string>
+    <string name="ime_service">FoxTouch 輸入法</string>
+    <string name="ime_enabled">已啟用</string>
+    <string name="ime_not_enabled">未啟用 - 點擊啟用</string>
+    <string name="ime_desc">在所有應用程式中實現可靠的文字輸入和剪貼簿存取</string>
+    <string name="enhanced_screenshot">增強截圖</string>
+    <string name="enhanced_screenshot_desc">對阻止無障礙截圖的應用程式使用 MediaProjection（如微信）</string>
+    <string name="enhanced_screenshot_grant">請先授予螢幕錄製權限</string>
+    <string name="enhanced_screenshot_apps">增強截圖應用程式</string>
+    <string name="enhanced_screenshot_apps_desc">選擇需要 MediaProjection 截圖的應用程式</string>
+    <string name="enhanced_screenshot_add">新增應用程式</string>
+    <string name="enhanced_screenshot_none">未設定應用程式。點擊「新增應用程式」選擇需要增強截圖的應用程式。</string>
+    <string name="enhanced_screenshot_authorized">已授權螢幕錄製</string>
+    <string name="enhanced_screenshot_not_authorized">點擊授予螢幕錄製權限</string>
+    <string name="yolo_warning_title">YOLO 模式警告</string>
+    <string name="yolo_warning_desc">YOLO 模式啟用時，AI 將執行所有操作（點擊、輸入、滑動、啟動應用程式）而不請求批准。使用風險自負。你可以在聊天介面使用切換按鈕來切換模式。</string>
+    <string name="app_language">應用程式語言</string>
+    <string name="system_default">跟隨系統</string>
+    <string name="about_version">FoxTouch v0.1.0</string>
+    <string name="about_desc">AI 手機助手</string>
+    <string name="about_desc_debug">AI 手機助手（除錯模式已啟用）</string>
+    <string name="json_display_mode">JSON 顯示模式</string>
+    <string name="json_display_desc">在工具呼叫和審批對話方塊中顯示原始 JSON</string>
+    <string name="preview_device_context">預覽裝置上下文</string>
+    <string name="preview_device_context_desc">檢視 AI 接收到的裝置資訊</string>
+    <string name="disable_debug">關閉除錯模式</string>
+    <string name="disable_debug_desc">隱藏除錯選項</string>
+    <string name="device_context_title">裝置上下文預覽</string>
+    <string name="device_context_desc">以下是注入到 AI 系統提示詞中的裝置資訊：</string>
+    <string name="api_key_label">API 金鑰</string>
+    <string name="save">儲存</string>
+    <string name="close">關閉</string>
+    <string name="ok">確定</string>
+    <string name="back">返回</string>
+
     <!-- Voice -->
     <string name="voice_listening">正在聆聽…</string>
     <string name="voice_speak">說話</string>
     <string name="tts_on">語音已開</string>
     <string name="tts_off">語音已關</string>
+    <string name="voice_unavailable_title">語音辨識不可用</string>
+    <string name="voice_unavailable_message">此裝置不支援語音辨識。請安裝或啟用 Google 應用程式以使用語音輸入。</string>
+    <string name="install_google_app">安裝 Google 應用程式</string>
+
+    <!-- Confirm Completion -->
+    <string name="completion_title">任務已完成？</string>
+    <string name="completion_confirmed">已完成</string>
+    <string name="completion_not_done">未完成</string>
+    <string name="completion_reason_hint">還有什麼需要做的？</string>
+
+    <!-- Skills -->
+    <string name="save_as_skill">儲存為技能</string>
+    <string name="skills_title">技能</string>
+    <string name="skills_desc">管理可複用的操作方案</string>
+    <string name="no_skills_yet">暫無技能。技能從已批准的方案中儲存。</string>
+    <string name="edit_skill">編輯技能</string>
+    <string name="new_skill">新技能</string>
+    <string name="skill_title_label">標題</string>
+    <string name="skill_content_label">內容（Markdown）</string>
+    <string name="delete_skill">刪除技能</string>
+    <string name="delete_skill_confirm">刪除此技能？此操作無法復原。</string>
+
+    <!-- Compact -->
+    <string name="compact_threshold">壓縮閾值</string>
+    <string name="compact_threshold_desc">達到此 token 數時自動壓縮對話</string>
+    <string name="compact_model">壓縮模型</string>
+    <string name="compact_model_desc">用於摘要的模型</string>
+    <string name="compact_model_placeholder">使用目前模型</string>
+    <string name="compact_prompt">壓縮提示詞</string>
+    <string name="compact_prompt_desc">自訂摘要提示詞</string>
+    <string name="reset_to_default">恢復預設</string>
+    <string name="compact_warning">距自動壓縮還剩 %d%%</string>
+    <string name="auto_delete_tasks">完成時自動刪除任務</string>
+    <string name="auto_delete_tasks_desc">使用者確認完成後刪除所有子任務</string>
+    <string name="context_compacted">上下文已壓縮 — 對話已摘要以保持在 token 限制內。</string>
+
+    <!-- Context Window -->
+    <string name="context_window">上下文視窗</string>
+    <string name="context_window_auto">自動（%1$s）</string>
+    <string name="context_window_input_hint">輸入 token 數量（如 128000）</string>
+    <string name="custom_value">自訂值…</string>
+
+    <!-- Custom Model -->
+    <string name="custom_model">自訂模型</string>
+    <string name="custom_model_hint">輸入模型名稱（如 gpt-4o）</string>
+    <string name="custom_model_option">自訂模型…</string>
+
+    <!-- Provider Management -->
+    <string name="key_configured">已設定 API 金鑰</string>
+    <string name="key_not_configured">未設定 API 金鑰</string>
+    <string name="model_fetch_retry">重試</string>
+    <string name="api_key_unchanged_hint">留空以保留目前金鑰</string>
+
+    <!-- URL Validation -->
+    <string name="url_invalid">URL 格式無效</string>
+    <string name="url_add_https">新增 https://</string>
 </resources>

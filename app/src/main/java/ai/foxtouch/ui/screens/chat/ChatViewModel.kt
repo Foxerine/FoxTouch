@@ -20,8 +20,7 @@ import ai.foxtouch.data.repository.MessageRepository
 import ai.foxtouch.data.repository.SessionRepository
 import ai.foxtouch.data.repository.TaskRepository
 import ai.foxtouch.tools.BackTool
-import ai.foxtouch.tools.ClickElementTool
-import ai.foxtouch.tools.TapTool
+import ai.foxtouch.tools.ClickTool
 import ai.foxtouch.tools.CreateTaskTool
 import ai.foxtouch.tools.HomeTool
 import ai.foxtouch.tools.LaunchAppTool
@@ -32,7 +31,6 @@ import ai.foxtouch.tools.ScrollTool
 import ai.foxtouch.tools.SwipeTool
 import ai.foxtouch.tools.ToolRegistry
 import ai.foxtouch.tools.ClipboardTool
-import ai.foxtouch.tools.TypeAtTool
 import ai.foxtouch.tools.TypeTextTool
 import ai.foxtouch.tools.UpdateTaskTool
 import ai.foxtouch.tools.ListAppsTool
@@ -148,6 +146,10 @@ class ChatViewModel @Inject constructor(
     private val _sessionSizes = MutableStateFlow<Map<String, Long>>(emptyMap())
     val sessionSizes: StateFlow<Map<String, Long>> = _sessionSizes.asStateFlow()
 
+    val contextUsagePercent: StateFlow<Int?> = agentRunner.contextUsage
+        .map { it?.remainingPercent }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
     val taskProgress: StateFlow<TaskProgress> = _sessionTasks
         .map { tasks ->
             TaskProgress(
@@ -170,12 +172,13 @@ class ChatViewModel @Inject constructor(
     init {
         registerTools()
         viewModelScope.launch {
-            // If the agent is currently busy with a session, resume it instead of creating new
+            // If the agent is currently busy with a session, resume it instead of creating new.
+            // Otherwise, resume the most recent session (don't create a new empty one).
             val activeSessionId = agentRunner.currentSessionId
             if (agentRunner.isBusy.value && activeSessionId != null) {
                 switchSession(activeSessionId)
             } else {
-                startNewSession()
+                resumeOrCreateSession()
             }
         }
         collectVoiceResults()
@@ -199,11 +202,9 @@ class ChatViewModel @Inject constructor(
 
     private fun registerTools() {
         toolRegistry.registerAll(
-            ReadScreenTool(appSettings),
-            ClickElementTool(appSettings),
-            TapTool(appSettings),
+            ReadScreenTool(appContext, appSettings),
+            ClickTool(appSettings),
             TypeTextTool(appSettings),
-            TypeAtTool(appSettings),
             ClipboardTool(),
             ScrollTool(),
             SwipeTool(),
@@ -313,7 +314,9 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             val sessions = allSessions.value
             val sizes = sessions.associate { session ->
-                session.id to messageRepository.getScreenshotSizeBySession(session.id)
+                val screenshotSize = messageRepository.getScreenshotSizeBySession(session.id)
+                val contentSize = messageRepository.getSessionContentSize(session.id)
+                session.id to (screenshotSize + contentSize)
             }
             _sessionSizes.value = sizes
         }
@@ -414,6 +417,19 @@ class ChatViewModel @Inject constructor(
         agentRunner.respondToUserQuestion(answer)
     }
 
+    /**
+     * On startup, resume the most recent session if one exists.
+     * Only creates a new session if there are no existing sessions.
+     */
+    private suspend fun resumeOrCreateSession() {
+        val recent = sessionRepository.getMostRecent()
+        if (recent != null) {
+            switchSession(recent.id)
+            return
+        }
+        startNewSession()
+    }
+
     private suspend fun startNewSession() {
         val session = sessionRepository.create(
             provider = appSettings.getProviderOnce(),
@@ -442,9 +458,14 @@ class ChatViewModel @Inject constructor(
     fun switchSession(sessionId: String) {
         if (sessionId == _uiState.value.currentSessionId) return
         viewModelScope.launch {
-            // Cancel any in-flight agent turn before switching context
-            agentRunner.cancelCurrentTurn()
-            agentRunner.clearHistory()
+            // Only cancel the agent if we're switching AWAY from its active session.
+            // When resuming the agent's current session (e.g. opening app from overlay),
+            // we must NOT cancel the in-flight turn.
+            val isAgentSession = agentRunner.currentSessionId == sessionId
+            if (!isAgentSession) {
+                agentRunner.cancelCurrentTurn()
+                agentRunner.clearHistory()
+            }
             registerTaskTools(sessionId)
             observeSessionTasks(sessionId)
             agentRunner.setCurrentSessionId(sessionId)

@@ -90,6 +90,9 @@
     <string name="task_in_progress">in progress</string>
     <string name="task_failed">failed</string>
     <string name="task_pending">pending</string>
+    <string name="tasks_progress">%1$d/%2$d tasks</string>
+    <string name="task_label_now">Now</string>
+    <string name="task_label_next">Next</string>
 
     <!-- Sessions -->
     <string name="sessions_title">Sessions</string>
@@ -178,7 +181,7 @@
     <string name="ime_not_enabled">Not enabled - tap to enable</string>
     <string name="ime_desc">Enables reliable text input and clipboard access across all apps</string>
     <string name="enhanced_screenshot">Enhanced Screenshot</string>
-    <string name="enhanced_screenshot_desc">Use MediaProjection for apps that block accessibility screenshots (e.g., WeChat)</string>
+    <string name="enhanced_screenshot_desc">Use MediaProjection for apps that block accessibility screenshots</string>
     <string name="enhanced_screenshot_grant">Grant screen capture permission first</string>
     <string name="enhanced_screenshot_apps">Enhanced Screenshot Apps</string>
     <string name="enhanced_screenshot_apps_desc">Select apps that need MediaProjection-based screenshot</string>
@@ -224,6 +227,38 @@
 
     <!-- Skills -->
     <string name="save_as_skill">Save as Skill</string>
+    <string name="skills_title">Skills</string>
+    <string name="skills_desc">Manage reusable action plans</string>
+    <string name="no_skills_yet">No skills yet. Skills are saved from approved plans.</string>
+    <string name="edit_skill">Edit Skill</string>
+    <string name="new_skill">New Skill</string>
+    <string name="skill_title_label">Title</string>
+    <string name="skill_content_label">Content (Markdown)</string>
+    <string name="delete_skill">Delete Skill</string>
+    <string name="delete_skill_confirm">Delete this skill? This cannot be undone.</string>
+
+    <!-- Compact -->
+    <string name="compact_threshold">Compact Threshold</string>
+    <string name="compact_threshold_desc">Auto-compress conversation at this token count</string>
+    <string name="compact_model">Compact Model</string>
+    <string name="compact_model_desc">Model used for summarization</string>
+    <string name="compact_model_placeholder">Use current model</string>
+    <string name="compact_prompt">Compact Prompt</string>
+    <string name="compact_prompt_desc">Customize the summarization prompt</string>
+    <string name="reset_to_default">Reset to Default</string>
+    <string name="compact_warning">%d%% until auto-compact</string>
+    <string name="auto_delete_tasks">Auto-delete tasks on completion</string>
+    <string name="auto_delete_tasks_desc">Delete all sub-tasks when the user confirms completion</string>
+    <string name="context_compacted">Context compacted — conversation summarized to stay within token limits.</string>
+
+    <!-- Context Window -->
+    <string name="context_window">Context Window</string>
+    <string name="context_window_auto">Auto (%1$s)</string>
+    <string name="context_window_input_hint">Enter token count (e.g. 128000)</string>
+    <string name="custom_value">Custom value…</string>
+    <string name="sync_model_limits">Sync Model Context Windows</string>
+    <string name="sync_model_limits_desc">From litellm database (%1$d cached)</string>
+    <string name="syncing">Syncing…</string>
 
     <!-- Custom Model -->
     <string name="custom_model">Custom Model</string>
@@ -235,4 +270,8 @@
     <string name="key_not_configured">API key not set</string>
     <string name="model_fetch_retry">Retry</string>
     <string name="api_key_unchanged_hint">Leave blank to keep current key</string>
+
+    <!-- URL Validation -->
+    <string name="url_invalid">Invalid URL format</string>
+    <string name="url_add_https">Add https://</string>
 </resources>

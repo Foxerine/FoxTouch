@@ -21,6 +21,7 @@
     <string name="state_needs_approval">승인 필요</string>
     <string name="state_plan_ready">계획 준비 완료</string>
     <string name="state_asking_user">질문이 있습니다</string>
+    <string name="state_confirming_completion">작업 완료?</string>
     <string name="state_error">오류</string>
 
     <!-- Setup -->
@@ -88,6 +89,9 @@
     <string name="task_in_progress">진행 중</string>
     <string name="task_failed">실패</string>
     <string name="task_pending">대기 중</string>
+    <string name="tasks_progress">%1$d/%2$d 작업</string>
+    <string name="task_label_now">현재</string>
+    <string name="task_label_next">다음</string>
 
     <!-- Sessions -->
     <string name="sessions_title">세션</string>
@@ -101,9 +105,169 @@
     <string name="notification_waiting_answer">답변을 기다리고 있습니다…</string>
     <string name="notification_plan_review">계획 검토 대기</string>
 
+    <!-- Chat Screen -->
+    <string name="chat_history">채팅 기록</string>
+    <string name="delete_all">모두 삭제</string>
+    <string name="delete_all_title">모든 대화 삭제</string>
+    <string name="delete_all_message">다른 모든 대화를 삭제하고 현재 대화를 지웁니다. 이 작업은 되돌릴 수 없습니다.</string>
+    <string name="cancel">취소</string>
+    <string name="custom_response">%d. 사용자 지정 답변…</string>
+    <string name="type_your_answer">답변을 입력하세요…</string>
+    <string name="describe_changes">변경할 내용을 설명하세요…</string>
+    <string name="approve_manual">승인 (수동 승인)</string>
+    <string name="approve_auto">승인 (자동 실행)</string>
+    <string name="tasks_count">작업 (%d)</string>
+    <string name="working">작업 중…</string>
+    <string name="thinking">생각 중…</string>
+    <string name="executing">실행 중: %s</string>
+    <string name="waiting_approval">승인 대기: %s</string>
+    <string name="empty_state_subtitle">AI 스마트폰 에이전트. 무엇을 할지 알려주세요.</string>
+    <string name="logs_title">에이전트 로그</string>
+    <string name="entries_count">%d개 항목</string>
+    <string name="no_logs_yet">로그가 아직 없습니다. 메시지를 보내 에이전트 활동을 확인하세요.</string>
+
+    <!-- Settings Screen -->
+    <string name="section_ai_model">AI 모델</string>
+    <string name="section_api_key">API 키</string>
+    <string name="section_network">네트워크</string>
+    <string name="section_agent">에이전트</string>
+    <string name="section_assistant">어시스턴트</string>
+    <string name="section_voice">음성</string>
+    <string name="section_permissions">권한</string>
+    <string name="section_language">언어</string>
+    <string name="section_about">정보</string>
+    <string name="section_debug">디버그</string>
+    <string name="provider">제공자</string>
+    <string name="model">모델</string>
+    <string name="configure_api_key">API 키 설정</string>
+    <string name="encrypted_with_tink">Google Tink으로 암호화됨</string>
+    <string name="base_url">Base URL</string>
+    <string name="base_url_placeholder">기본값 (제공자에 따라 자동)</string>
+    <string name="save_base_url">Base URL 저장</string>
+    <string name="http_proxy">HTTP 프록시</string>
+    <string name="proxy_placeholder">예: 127.0.0.1:7890</string>
+    <string name="save_proxy">프록시 저장</string>
+    <string name="streaming">스트리밍</string>
+    <string name="streaming_on">실시간 스트리밍 출력</string>
+    <string name="streaming_off">전체 응답 대기</string>
+    <string name="max_iterations">최대 반복 횟수</string>
+    <string name="per_turn">턴당 %d회</string>
+    <string name="thinking_mode">사고 모드</string>
+    <string name="thinking_mode_on">확장 사고 활성화</string>
+    <string name="thinking_mode_off">직접 응답만</string>
+    <string name="agent_instructions">에이전트 지침 및 메모리</string>
+    <string name="agent_instructions_desc">에이전트 지침 편집 및 AI 메모리 보기</string>
+    <string name="set_default_assistant">기본 어시스턴트로 설정</string>
+    <string name="set_default_assistant_desc">FoxTouch를 시스템 디지털 어시스턴트로 설정</string>
+    <string name="tts_title">텍스트 음성 변환</string>
+    <string name="tts_desc">어시스턴트 응답을 소리내어 읽기</string>
+    <string name="speech_rate">음성 속도</string>
+    <string name="a11y_service">접근성 서비스</string>
+    <string name="a11y_connected">연결됨</string>
+    <string name="a11y_not_connected">연결 안 됨 - 탭하여 활성화</string>
+    <string name="overlay_permission">오버레이 권한</string>
+    <string name="overlay_granted">허용됨</string>
+    <string name="overlay_not_granted">허용 안 됨 - 탭하여 활성화</string>
+    <string name="floating_overlay">플로팅 오버레이</string>
+    <string name="overlay_on_desc">에이전트 실행 중 상태 버블 표시</string>
+    <string name="overlay_off_desc">오버레이 숨김 — 에이전트가 백그라운드에서 작동</string>
+    <string name="tool_permissions">도구 권한</string>
+    <string name="tool_permissions_desc">도구별 승인 정책 설정</string>
+    <string name="tool_permissions_info">실행 전 승인이 필요한 도구를 설정합니다.</string>
+    <string name="tool_permissions_hint">에이전트가 승인을 요청할 때 \'이 도구 항상 허용\'을 탭하여 권한을 변경할 수 있습니다.</string>
+    <string name="ime_service">FoxTouch 입력기</string>
+    <string name="ime_enabled">활성화됨</string>
+    <string name="ime_not_enabled">비활성화 - 탭하여 활성화</string>
+    <string name="ime_desc">모든 앱에서 안정적인 텍스트 입력 및 클립보드 접근 지원</string>
+    <string name="enhanced_screenshot">향상된 스크린샷</string>
+    <string name="enhanced_screenshot_desc">접근성 스크린샷을 차단하는 앱에 MediaProjection 사용 (예: WeChat)</string>
+    <string name="enhanced_screenshot_grant">먼저 화면 캡처 권한을 부여하세요</string>
+    <string name="enhanced_screenshot_apps">향상된 스크린샷 앱</string>
+    <string name="enhanced_screenshot_apps_desc">MediaProjection 기반 스크린샷이 필요한 앱 선택</string>
+    <string name="enhanced_screenshot_add">앱 추가</string>
+    <string name="enhanced_screenshot_none">설정된 앱이 없습니다. \"앱 추가\"를 탭하여 일반 스크린샷이 차단되는 앱을 선택하세요.</string>
+    <string name="enhanced_screenshot_authorized">화면 캡처 허용됨</string>
+    <string name="enhanced_screenshot_not_authorized">탭하여 화면 캡처 권한 부여</string>
+    <string name="yolo_warning_title">YOLO 모드 경고</string>
+    <string name="yolo_warning_desc">YOLO 모드가 활성화되면 AI가 승인 없이 모든 작업(탭, 입력, 스와이프, 앱 실행)을 수행합니다. 사용에 따른 위험은 본인이 감수해야 합니다. 채팅 화면의 토글 버튼으로 모드를 변경할 수 있습니다.</string>
+    <string name="app_language">앱 언어</string>
+    <string name="system_default">시스템 기본값</string>
+    <string name="about_version">FoxTouch v0.1.0</string>
+    <string name="about_desc">AI 스마트폰 에이전트</string>
+    <string name="about_desc_debug">AI 스마트폰 에이전트 (디버그 모드 활성화)</string>
+    <string name="json_display_mode">JSON 표시 모드</string>
+    <string name="json_display_desc">도구 호출 및 승인 대화 상자에서 원시 JSON 표시</string>
+    <string name="preview_device_context">기기 컨텍스트 미리보기</string>
+    <string name="preview_device_context_desc">AI가 수신하는 기기 정보 보기</string>
+    <string name="disable_debug">디버그 모드 비활성화</string>
+    <string name="disable_debug_desc">디버그 옵션 숨기기</string>
+    <string name="device_context_title">기기 컨텍스트 미리보기</string>
+    <string name="device_context_desc">AI 시스템 프롬프트에 주입되는 기기 정보:</string>
+    <string name="api_key_label">API 키</string>
+    <string name="save">저장</string>
+    <string name="close">닫기</string>
+    <string name="ok">확인</string>
+    <string name="back">뒤로</string>
+
     <!-- Voice -->
     <string name="voice_listening">듣는 중…</string>
     <string name="voice_speak">말하기</string>
     <string name="tts_on">음성 켜기</string>
     <string name="tts_off">음성 끄기</string>
+    <string name="voice_unavailable_title">음성 인식을 사용할 수 없습니다</string>
+    <string name="voice_unavailable_message">이 기기에서 음성 인식을 사용할 수 없습니다. 음성 입력을 사용하려면 Google 앱을 설치하거나 활성화하세요.</string>
+    <string name="install_google_app">Google 앱 설치</string>
+
+    <!-- Confirm Completion -->
+    <string name="completion_title">작업 완료?</string>
+    <string name="completion_confirmed">완료됨</string>
+    <string name="completion_not_done">미완료</string>
+    <string name="completion_reason_hint">아직 무엇이 필요한가요?</string>
+
+    <!-- Skills -->
+    <string name="save_as_skill">스킬로 저장</string>
+    <string name="skills_title">스킬</string>
+    <string name="skills_desc">재사용 가능한 액션 플랜 관리</string>
+    <string name="no_skills_yet">스킬이 아직 없습니다. 승인된 계획에서 저장됩니다.</string>
+    <string name="edit_skill">스킬 편집</string>
+    <string name="new_skill">새 스킬</string>
+    <string name="skill_title_label">제목</string>
+    <string name="skill_content_label">내용 (Markdown)</string>
+    <string name="delete_skill">스킬 삭제</string>
+    <string name="delete_skill_confirm">이 스킬을 삭제하시겠습니까? 되돌릴 수 없습니다.</string>
+
+    <!-- Compact -->
+    <string name="compact_threshold">압축 임계값</string>
+    <string name="compact_threshold_desc">이 토큰 수에서 대화 자동 압축</string>
+    <string name="compact_model">압축 모델</string>
+    <string name="compact_model_desc">요약에 사용할 모델</string>
+    <string name="compact_model_placeholder">현재 모델 사용</string>
+    <string name="compact_prompt">압축 프롬프트</string>
+    <string name="compact_prompt_desc">요약 프롬프트 사용자 지정</string>
+    <string name="reset_to_default">기본값으로 재설정</string>
+    <string name="compact_warning">자동 압축까지 %d%% 남음</string>
+    <string name="auto_delete_tasks">완료 시 작업 자동 삭제</string>
+    <string name="auto_delete_tasks_desc">사용자가 완료를 확인하면 모든 하위 작업 삭제</string>
+    <string name="context_compacted">컨텍스트가 압축되었습니다 — 토큰 한도 내에서 유지하기 위해 대화가 요약되었습니다.</string>
+
+    <!-- Context Window -->
+    <string name="context_window">컨텍스트 윈도우</string>
+    <string name="context_window_auto">자동 (%1$s)</string>
+    <string name="context_window_input_hint">토큰 수 입력 (예: 128000)</string>
+    <string name="custom_value">사용자 지정 값…</string>
+
+    <!-- Custom Model -->
+    <string name="custom_model">커스텀 모델</string>
+    <string name="custom_model_hint">모델 이름 입력 (예: gpt-4o)</string>
+    <string name="custom_model_option">커스텀 모델…</string>
+
+    <!-- Provider Management -->
+    <string name="key_configured">API 키 설정됨</string>
+    <string name="key_not_configured">API 키 미설정</string>
+    <string name="model_fetch_retry">재시도</string>
+    <string name="api_key_unchanged_hint">현재 키를 유지하려면 비워두세요</string>
+
+    <!-- URL Validation -->
+    <string name="url_invalid">잘못된 URL 형식</string>
+    <string name="url_add_https">https:// 추가</string>
 </resources>

@@ -14,6 +14,8 @@ class SessionRepository @Inject constructor(
 
     suspend fun getById(id: String): SessionEntity? = sessionDao.getById(id)
 
+    suspend fun getMostRecent(): SessionEntity? = sessionDao.getMostRecent()
+
     suspend fun create(
         title: String = "New Session",
         provider: String = "gemini",

@@ -1,8 +1,12 @@
 package ai.foxtouch.ui.overlay
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +22,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
@@ -90,6 +96,7 @@ fun OverlayBar(
     onCompletionConfirm: () -> Unit = {},
     onCompletionReject: (String) -> Unit = {},
     onCompletionDismiss: () -> Unit = {},
+    showCompletionSuccess: Boolean = false,
     onDragDelta: (Float) -> Unit = {},
     onDragReset: () -> Unit = {},
 ) {
@@ -132,23 +139,39 @@ fun OverlayBar(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                // Status dot
+                // Status dot — green when completion success
+                val dotColor = if (showCompletionSuccess) {
+                    androidx.compose.ui.graphics.Color(0xFF66BB6A)
+                } else {
+                    agentStateColor(state)
+                }
                 Surface(
                     shape = RoundedCornerShape(50),
-                    color = agentStateColor(state),
+                    color = dotColor,
                     modifier = Modifier.size(10.dp),
                 ) {}
 
                 Spacer(Modifier.width(8.dp))
 
                 // Status label
-                Text(
-                    text = agentStateLabelRes(state),
-                    style = MaterialTheme.typography.labelMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
+                AnimatedContent(
+                    targetState = showCompletionSuccess,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                    label = "statusLabel",
                     modifier = Modifier.weight(1f),
-                )
+                ) { isSuccess ->
+                    Text(
+                        text = if (isSuccess) stringResource(R.string.completion_confirmed) else agentStateLabelRes(state),
+                        style = MaterialTheme.typography.labelMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = if (isSuccess) {
+                            androidx.compose.ui.graphics.Color(0xFF66BB6A)
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
+                    )
+                }
 
                 // Agent mode toggle
                 AgentModeToggle(
@@ -207,16 +230,20 @@ fun OverlayBar(
                         )
                     }
 
-                    // Message preview
+                    // Message preview — scrollable, max 2 visible lines
                     if (lastMessage != null) {
-                        Text(
-                            text = lastMessage,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(bottom = 6.dp),
-                        )
+                        Box(
+                            modifier = Modifier
+                                .heightIn(max = 40.dp)
+                                .verticalScroll(rememberScrollState())
+                                .padding(bottom = 6.dp),
+                        ) {
+                            Text(
+                                text = lastMessage,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
 
                     // Approval card

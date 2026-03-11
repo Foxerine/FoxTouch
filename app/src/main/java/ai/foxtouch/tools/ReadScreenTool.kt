@@ -1,5 +1,11 @@
 package ai.foxtouch.tools
 
+import android.content.ContentValues
+import android.content.Context
+import android.graphics.Bitmap
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
 import ai.foxtouch.accessibility.AccessibilityBridge
 import ai.foxtouch.accessibility.ScreenAnnotator
 import ai.foxtouch.accessibility.ScreenCaptureManager
@@ -7,8 +13,12 @@ import ai.foxtouch.agent.ToolDefinition
 import ai.foxtouch.data.preferences.AppSettings
 import ai.foxtouch.data.preferences.ScreenshotMode
 import kotlinx.serialization.json.JsonObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class ReadScreenTool(
+    private val appContext: Context,
     private val appSettings: AppSettings? = null,
 ) : PhoneTool {
 
@@ -25,6 +35,7 @@ class ReadScreenTool(
             boolean("show_elements", "Draw element boundaries from UI tree on the screenshot, color-coded: green=clickable, blue=scrollable, orange=editable, gray=other. Each element is labeled with its [ID] (default false)")
             boolean("show_labels", "Show element text and class name labels next to boundaries. Requires show_elements=true (default false)")
             boolean("clickable_only", "Only annotate interactive elements (clickable, scrollable, editable). Requires show_elements=true (default false)")
+            boolean("save_to_gallery", "Save the screenshot (without annotations) to the device's photo gallery (default false)")
         },
     )
 
@@ -37,6 +48,7 @@ class ReadScreenTool(
         val showElements = args.optionalBoolean("show_elements", false)
         val showLabels = args.optionalBoolean("show_labels", false)
         val clickableOnly = args.optionalBoolean("clickable_only", false)
+        val saveToGallery = args.optionalBoolean("save_to_gallery", false)
 
         val uiTree = AccessibilityBridge.readUITree()
         val result = StringBuilder()
@@ -81,6 +93,17 @@ class ReadScreenTool(
                     options,
                 )
                 screenshotBase64 = AccessibilityBridge.encodeBitmapToBase64(annotated)
+
+                // Save raw (unannotated) screenshot to gallery if requested
+                if (saveToGallery) {
+                    try {
+                        val savedPath = saveScreenshotToGallery(captured.bitmap)
+                        result.appendLine("Screenshot saved to gallery: $savedPath")
+                    } catch (e: Exception) {
+                        result.appendLine("Failed to save screenshot: ${e.message}")
+                    }
+                }
+
                 captured.bitmap.recycle()
                 annotated.recycle()
 
@@ -97,5 +120,31 @@ class ReadScreenTool(
         }
 
         return ToolResult(text = result.toString(), imageBase64 = screenshotBase64)
+    }
+
+    private fun saveScreenshotToGallery(bitmap: Bitmap): String {
+        val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+        val filename = "FoxTouch_$timestamp.png"
+
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Screenshots")
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+
+        val resolver = appContext.contentResolver
+        val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+            ?: throw RuntimeException("Failed to create MediaStore entry")
+
+        resolver.openOutputStream(uri)?.use { out ->
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        } ?: throw RuntimeException("Failed to open output stream")
+
+        contentValues.clear()
+        contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+        resolver.update(uri, contentValues, null, null)
+
+        return "Pictures/Screenshots/$filename"
     }
 }

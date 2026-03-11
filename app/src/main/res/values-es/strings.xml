@@ -21,6 +21,7 @@
     <string name="state_needs_approval">Necesita aprobación</string>
     <string name="state_plan_ready">Plan listo</string>
     <string name="state_asking_user">Tiene una pregunta</string>
+    <string name="state_confirming_completion">¿Tarea completada?</string>
     <string name="state_error">Error</string>
 
     <!-- Setup -->
@@ -88,6 +89,9 @@
     <string name="task_in_progress">en progreso</string>
     <string name="task_failed">fallida</string>
     <string name="task_pending">pendiente</string>
+    <string name="tasks_progress">%1$d/%2$d tareas</string>
+    <string name="task_label_now">Actual</string>
+    <string name="task_label_next">Siguiente</string>
 
     <!-- Sessions -->
     <string name="sessions_title">Sesiones</string>
@@ -101,9 +105,169 @@
     <string name="notification_waiting_answer">Esperando tu respuesta…</string>
     <string name="notification_plan_review">Plan listo para revisión</string>
 
+    <!-- Chat Screen -->
+    <string name="chat_history">Historial de chat</string>
+    <string name="delete_all">Eliminar todo</string>
+    <string name="delete_all_title">Eliminar todas las conversaciones</string>
+    <string name="delete_all_message">Esto eliminará todas las demás conversaciones y borrará la actual. Esta acción no se puede deshacer.</string>
+    <string name="cancel">Cancelar</string>
+    <string name="custom_response">%d. Respuesta personalizada…</string>
+    <string name="type_your_answer">Escribe tu respuesta…</string>
+    <string name="describe_changes">Describe qué cambiar…</string>
+    <string name="approve_manual">Aprobar (aprobación manual)</string>
+    <string name="approve_auto">Aprobar (ejecución automática)</string>
+    <string name="tasks_count">Tareas (%d)</string>
+    <string name="working">Trabajando…</string>
+    <string name="thinking">Pensando…</string>
+    <string name="executing">Ejecutando: %s</string>
+    <string name="waiting_approval">Esperando aprobación: %s</string>
+    <string name="empty_state_subtitle">Tu agente de teléfono IA. Dime qué hacer.</string>
+    <string name="logs_title">Registros del agente</string>
+    <string name="entries_count">%d entradas</string>
+    <string name="no_logs_yet">Aún no hay registros. Envía un mensaje para ver la actividad del agente.</string>
+
+    <!-- Settings Screen -->
+    <string name="section_ai_model">Modelo IA</string>
+    <string name="section_api_key">Clave API</string>
+    <string name="section_network">Red</string>
+    <string name="section_agent">Agente</string>
+    <string name="section_assistant">Asistente</string>
+    <string name="section_voice">Voz</string>
+    <string name="section_permissions">Permisos</string>
+    <string name="section_language">Idioma</string>
+    <string name="section_about">Acerca de</string>
+    <string name="section_debug">Depuración</string>
+    <string name="provider">Proveedor</string>
+    <string name="model">Modelo</string>
+    <string name="configure_api_key">Configurar clave API</string>
+    <string name="encrypted_with_tink">Cifrado con Google Tink</string>
+    <string name="base_url">URL base</string>
+    <string name="base_url_placeholder">Predeterminado (automático por proveedor)</string>
+    <string name="save_base_url">Guardar URL base</string>
+    <string name="http_proxy">Proxy HTTP</string>
+    <string name="proxy_placeholder">ej. 127.0.0.1:7890</string>
+    <string name="save_proxy">Guardar proxy</string>
+    <string name="streaming">Transmisión</string>
+    <string name="streaming_on">Transmisión en tiempo real</string>
+    <string name="streaming_off">Esperar respuesta completa</string>
+    <string name="max_iterations">Máximo de iteraciones</string>
+    <string name="per_turn">%d por turno</string>
+    <string name="thinking_mode">Modo de pensamiento</string>
+    <string name="thinking_mode_on">Pensamiento extendido habilitado</string>
+    <string name="thinking_mode_off">Solo respuestas directas</string>
+    <string name="agent_instructions">Instrucciones del agente y memoria</string>
+    <string name="agent_instructions_desc">Editar instrucciones del agente y ver memoria IA</string>
+    <string name="set_default_assistant">Establecer como asistente predeterminado</string>
+    <string name="set_default_assistant_desc">Hacer de FoxTouch el asistente digital del sistema</string>
+    <string name="tts_title">Texto a voz</string>
+    <string name="tts_desc">Leer en voz alta las respuestas del asistente</string>
+    <string name="speech_rate">Velocidad de habla</string>
+    <string name="a11y_service">Servicio de accesibilidad</string>
+    <string name="a11y_connected">Conectado</string>
+    <string name="a11y_not_connected">No conectado - toca para habilitar</string>
+    <string name="overlay_permission">Permiso de superposición</string>
+    <string name="overlay_granted">Concedido</string>
+    <string name="overlay_not_granted">No concedido - toca para habilitar</string>
+    <string name="floating_overlay">Superposición flotante</string>
+    <string name="overlay_on_desc">Muestra burbuja de estado durante la ejecución del agente</string>
+    <string name="overlay_off_desc">Superposición oculta — el agente trabaja en segundo plano</string>
+    <string name="tool_permissions">Permisos de herramientas</string>
+    <string name="tool_permissions_desc">Configurar política de aprobación por herramienta</string>
+    <string name="tool_permissions_info">Configura qué herramientas requieren aprobación antes de ejecutarse.</string>
+    <string name="tool_permissions_hint">Puedes cambiar los permisos de herramientas cuando el agente pida aprobación tocando \'Permitir siempre esta herramienta\'.</string>
+    <string name="ime_service">Método de entrada FoxTouch</string>
+    <string name="ime_enabled">Habilitado</string>
+    <string name="ime_not_enabled">No habilitado - toca para habilitar</string>
+    <string name="ime_desc">Permite entrada de texto y acceso al portapapeles en todas las aplicaciones</string>
+    <string name="enhanced_screenshot">Captura mejorada</string>
+    <string name="enhanced_screenshot_desc">Usar MediaProjection para apps que bloquean capturas de accesibilidad (ej. WeChat)</string>
+    <string name="enhanced_screenshot_grant">Primero otorga permiso de captura de pantalla</string>
+    <string name="enhanced_screenshot_apps">Apps de captura mejorada</string>
+    <string name="enhanced_screenshot_apps_desc">Selecciona apps que necesitan captura basada en MediaProjection</string>
+    <string name="enhanced_screenshot_add">Agregar app</string>
+    <string name="enhanced_screenshot_none">No hay apps configuradas. Toca \"Agregar app\" para seleccionar apps que bloquean capturas normales.</string>
+    <string name="enhanced_screenshot_authorized">Captura de pantalla autorizada</string>
+    <string name="enhanced_screenshot_not_authorized">Toca para otorgar permiso de captura de pantalla</string>
+    <string name="yolo_warning_title">Advertencia de modo YOLO</string>
+    <string name="yolo_warning_desc">Cuando el modo YOLO está activo, la IA ejecutará TODAS las acciones (toques, escritura, deslizamientos, lanzamiento de apps) sin pedir aprobación. Úsalo bajo tu propio riesgo. Puedes cambiar de modo usando el botón en la pantalla de chat.</string>
+    <string name="app_language">Idioma de la app</string>
+    <string name="system_default">Predeterminado del sistema</string>
+    <string name="about_version">FoxTouch v0.1.0</string>
+    <string name="about_desc">Agente de teléfono IA</string>
+    <string name="about_desc_debug">Agente de teléfono IA (modo depuración habilitado)</string>
+    <string name="json_display_mode">Modo de visualización JSON</string>
+    <string name="json_display_desc">Mostrar JSON sin procesar en llamadas de herramientas y diálogos de aprobación</string>
+    <string name="preview_device_context">Vista previa del contexto del dispositivo</string>
+    <string name="preview_device_context_desc">Ver qué información del dispositivo recibe la IA</string>
+    <string name="disable_debug">Desactivar modo depuración</string>
+    <string name="disable_debug_desc">Ocultar opciones de depuración</string>
+    <string name="device_context_title">Vista previa del contexto del dispositivo</string>
+    <string name="device_context_desc">Esta es la información del dispositivo inyectada en el prompt del sistema de la IA:</string>
+    <string name="api_key_label">Clave API</string>
+    <string name="save">Guardar</string>
+    <string name="close">Cerrar</string>
+    <string name="ok">Aceptar</string>
+    <string name="back">Atrás</string>
+
     <!-- Voice -->
     <string name="voice_listening">Escuchando…</string>
     <string name="voice_speak">Hablar</string>
     <string name="tts_on">Voz activada</string>
     <string name="tts_off">Voz desactivada</string>
+    <string name="voice_unavailable_title">Reconocimiento de voz no disponible</string>
+    <string name="voice_unavailable_message">El reconocimiento de voz no está disponible en este dispositivo. Instala o habilita la app de Google para usar entrada de voz.</string>
+    <string name="install_google_app">Instalar app de Google</string>
+
+    <!-- Confirm Completion -->
+    <string name="completion_title">¿Tarea completada?</string>
+    <string name="completion_confirmed">Completada</string>
+    <string name="completion_not_done">No terminada</string>
+    <string name="completion_reason_hint">¿Qué falta por hacer?</string>
+
+    <!-- Skills -->
+    <string name="save_as_skill">Guardar como habilidad</string>
+    <string name="skills_title">Habilidades</string>
+    <string name="skills_desc">Gestionar planes de acción reutilizables</string>
+    <string name="no_skills_yet">Aún no hay habilidades. Se guardan desde planes aprobados.</string>
+    <string name="edit_skill">Editar habilidad</string>
+    <string name="new_skill">Nueva habilidad</string>
+    <string name="skill_title_label">Título</string>
+    <string name="skill_content_label">Contenido (Markdown)</string>
+    <string name="delete_skill">Eliminar habilidad</string>
+    <string name="delete_skill_confirm">¿Eliminar esta habilidad? No se puede deshacer.</string>
+
+    <!-- Compact -->
+    <string name="compact_threshold">Umbral de compactación</string>
+    <string name="compact_threshold_desc">Comprimir automáticamente la conversación en este conteo de tokens</string>
+    <string name="compact_model">Modelo de compactación</string>
+    <string name="compact_model_desc">Modelo usado para resumen</string>
+    <string name="compact_model_placeholder">Usar modelo actual</string>
+    <string name="compact_prompt">Prompt de compactación</string>
+    <string name="compact_prompt_desc">Personalizar el prompt de resumen</string>
+    <string name="reset_to_default">Restablecer predeterminados</string>
+    <string name="compact_warning">%d%% hasta auto-compactación</string>
+    <string name="auto_delete_tasks">Eliminar tareas al completar</string>
+    <string name="auto_delete_tasks_desc">Eliminar todas las subtareas cuando el usuario confirme la finalización</string>
+    <string name="context_compacted">Contexto compactado — la conversación se resumió para mantenerse dentro de los límites de tokens.</string>
+
+    <!-- Context Window -->
+    <string name="context_window">Ventana de contexto</string>
+    <string name="context_window_auto">Auto (%1$s)</string>
+    <string name="context_window_input_hint">Ingresa conteo de tokens (ej. 128000)</string>
+    <string name="custom_value">Valor personalizado…</string>
+
+    <!-- Custom Model -->
+    <string name="custom_model">Modelo personalizado</string>
+    <string name="custom_model_hint">Ingresa nombre del modelo (ej. gpt-4o)</string>
+    <string name="custom_model_option">Modelo personalizado…</string>
+
+    <!-- Provider Management -->
+    <string name="key_configured">Clave API configurada</string>
+    <string name="key_not_configured">Clave API no configurada</string>
+    <string name="model_fetch_retry">Reintentar</string>
+    <string name="api_key_unchanged_hint">Dejar en blanco para mantener la clave actual</string>
+
+    <!-- URL Validation -->
+    <string name="url_invalid">Formato de URL inválido</string>
+    <string name="url_add_https">Agregar https://</string>
 </resources>
