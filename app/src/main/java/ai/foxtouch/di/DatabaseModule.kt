@@ -25,7 +25,7 @@ object DatabaseModule {
             FoxTouchDatabase::class.java,
             "foxtouch.db"
         )
-            .addMigrations(FoxTouchDatabase.MIGRATION_1_2)
+            .addMigrations(FoxTouchDatabase.MIGRATION_1_2, FoxTouchDatabase.MIGRATION_2_3)
             .build()
 
     @Provides

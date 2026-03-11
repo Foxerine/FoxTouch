@@ -87,6 +87,7 @@ class GeminiProvider(
 
         checkTopLevelErrors(responseJson)?.let { emit(it); emit(LLMEvent.Done); return@flow }
         emitCandidates(responseJson, responseJson.toString())
+        emitUsageMetadata(responseJson)
         emit(LLMEvent.Done)
     }
 
@@ -134,7 +135,20 @@ class GeminiProvider(
         if (!hasContent) {
             emit(LLMEvent.Error("Gemini streaming: empty response"))
         }
+        // Note: streaming mode may not reliably provide usageMetadata in every chunk
         emit(LLMEvent.Done)
+    }
+
+    private suspend fun kotlinx.coroutines.flow.FlowCollector<LLMEvent>.emitUsageMetadata(
+        responseJson: JsonObject,
+    ) {
+        val usage = responseJson["usageMetadata"]?.jsonObject ?: return
+        val prompt = usage["promptTokenCount"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0
+        val completion = usage["candidatesTokenCount"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0
+        val total = usage["totalTokenCount"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0
+        if (prompt > 0 || total > 0) {
+            emit(LLMEvent.Usage(promptTokens = prompt, completionTokens = completion, totalTokens = total))
+        }
     }
 
     // ── Response parsing helpers ───────────────────────────────────────

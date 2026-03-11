@@ -13,13 +13,21 @@ class TypeTextTool(
 
     override val definition = ToolDefinition(
         name = "type_text",
-        description = "Type text into the currently focused input field, or focus an element by ID first then type. " +
+        description = "Type text into an input field. " +
+            "Optionally focus an element first by element_id or x/y coordinates. " +
+            "If no focus target is specified, types into the currently focused field. " +
             "Set paste=true to type from clipboard content instead of text parameter.",
         parameters = toolParameters {
             string("text", "The text to type (ignored if paste=true)", required = true)
-            int("element_id", "Element ID to focus before typing")
+            int("element_id", "Element ID to focus before typing (from read_screen)")
+            int("x", "X coordinate to tap for focus (use with y, alternative to element_id)")
+            int("y", "Y coordinate to tap for focus (use with x, alternative to element_id)")
             boolean("paste", "Use clipboard content instead of text (default false)")
-            boolean("feedback", "Capture a post-typing screenshot (default false)")
+            enum("feedback", listOf("none", "before_wait", "after_wait"),
+                "Screenshot feedback mode: 'none' = no screenshot (default), " +
+                "'before_wait' = capture screenshot immediately after typing then wait, " +
+                "'after_wait' = wait first then capture screenshot")
+            int("wait_ms", "Wait duration in milliseconds after typing (default 0, max 10000).")
             boolean("show_elements", "Draw element boundaries on feedback screenshot (default false)")
         },
     )
@@ -29,8 +37,11 @@ class TypeTextTool(
     override suspend fun execute(args: JsonObject): ToolResult {
         var text = args.requireString("text") ?: ""
         val elementId = args.requireInt("element_id")?.takeIf { it > 0 }
+        val x = args.requireInt("x")
+        val y = args.requireInt("y")
         val paste = args.optionalBoolean("paste", false)
-        val feedback = args.optionalBoolean("feedback", false)
+        val feedback = args.requireString("feedback") ?: "none"
+        val waitMs = args.optionalLong("wait_ms", 0L)
         val showElements = args.optionalBoolean("show_elements", false)
 
         if (paste) {
@@ -44,12 +55,20 @@ class TypeTextTool(
         var focusY = 0f
 
         val resultText = try {
-            if (elementId != null) {
-                val bounds = AccessibilityBridge.getElementBounds(elementId)
-                focusX = bounds?.centerX()?.toFloat() ?: 0f
-                focusY = bounds?.centerY()?.toFloat() ?: 0f
-                AccessibilityBridge.clickNode(elementId)
-                delay(200)
+            when {
+                elementId != null -> {
+                    val bounds = AccessibilityBridge.getElementBounds(elementId)
+                    focusX = bounds?.centerX()?.toFloat() ?: 0f
+                    focusY = bounds?.centerY()?.toFloat() ?: 0f
+                    AccessibilityBridge.clickNode(elementId)
+                    delay(200)
+                }
+                x != null && y != null -> {
+                    focusX = x.toFloat()
+                    focusY = y.toFloat()
+                    AccessibilityBridge.clickCoordinate(focusX, focusY)
+                    delay(200)
+                }
             }
             val success = typeWithFallback(text)
             val source = if (paste) " (from clipboard)" else ""
@@ -59,62 +78,7 @@ class TypeTextTool(
             "Error typing text: ${e.message}"
         }
 
-        return captureFeedbackIfRequested(resultText, focusX, focusY, feedback, showElements, appSettings)
-    }
-}
-
-class TypeAtTool(
-    private val appSettings: AppSettings? = null,
-) : PhoneTool {
-
-    override val definition = ToolDefinition(
-        name = "type_at",
-        description = "Tap at screen coordinates to focus an input field, then type text. " +
-            "Set paste=true to type from clipboard content instead of text parameter.",
-        parameters = toolParameters {
-            string("text", "The text to type (ignored if paste=true)", required = true)
-            int("x", "X coordinate to tap for focus", required = true)
-            int("y", "Y coordinate to tap for focus", required = true)
-            boolean("paste", "Use clipboard content instead of text (default false)")
-            boolean("feedback", "Capture a post-typing screenshot (default false)")
-            boolean("show_elements", "Draw element boundaries on feedback screenshot (default false)")
-        },
-    )
-
-    override val riskLevel = RiskLevel.HIGH
-
-    override suspend fun execute(args: JsonObject): ToolResult {
-        var text = args.requireString("text") ?: ""
-        val x = args.requireInt("x")
-            ?: return ToolResult("Error: x is required")
-        val y = args.requireInt("y")
-            ?: return ToolResult("Error: y is required")
-        val paste = args.optionalBoolean("paste", false)
-        val feedback = args.optionalBoolean("feedback", false)
-        val showElements = args.optionalBoolean("show_elements", false)
-
-        if (paste) {
-            text = AccessibilityBridge.readClipboard()
-                ?: return ToolResult("Error: clipboard is empty")
-        }
-
-        if (text.isEmpty()) return ToolResult("Error: text is empty")
-
-        val clickX = x.toFloat()
-        val clickY = y.toFloat()
-
-        val resultText = try {
-            AccessibilityBridge.clickCoordinate(clickX, clickY)
-            delay(200)
-            val success = typeWithFallback(text)
-            val source = if (paste) " (from clipboard)" else ""
-            if (success) "Typed \"${text.take(100)}\"$source at ($x, $y) successfully"
-            else "Failed to type text - no focused input field found at ($x, $y)"
-        } catch (e: Exception) {
-            "Error typing text at ($x, $y): ${e.message}"
-        }
-
-        return captureFeedbackIfRequested(resultText, clickX, clickY, feedback, showElements, appSettings)
+        return captureFeedbackIfRequested(resultText, focusX, focusY, feedback, waitMs, showElements, appSettings)
     }
 }
 

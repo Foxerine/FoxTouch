@@ -35,6 +35,8 @@ class SessionRepository @Inject constructor(
         sessionDao.update(session.copy(title = title, updatedAt = System.currentTimeMillis()))
     }
 
+    suspend fun updateTokenCount(id: String, tokenCount: Int) = sessionDao.updateTokenCount(id, tokenCount)
+
     suspend fun delete(id: String) = sessionDao.deleteById(id)
 
     suspend fun deleteAllExcept(excludeId: String) = sessionDao.deleteAllExcept(excludeId)

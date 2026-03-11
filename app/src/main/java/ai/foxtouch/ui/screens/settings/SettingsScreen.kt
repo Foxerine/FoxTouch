@@ -20,23 +20,29 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Accessibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Assistant
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CameraEnhance
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Key
 import androidx.compose.material.icons.filled.Keyboard
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Terminal
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -63,10 +69,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -75,9 +83,12 @@ import ai.foxtouch.R
 import ai.foxtouch.accessibility.AccessibilityBridge
 import ai.foxtouch.accessibility.ScreenCaptureManager
 import ai.foxtouch.agent.AVAILABLE_PROVIDERS
+import ai.foxtouch.agent.ModelTokenLimits
+import ai.foxtouch.agent.SkillSummary
 import ai.foxtouch.data.preferences.SUPPORTED_LANGUAGES
 import ai.foxtouch.agent.getDefaultModel
 import ai.foxtouch.agent.getProviderInfo
+import ai.foxtouch.ui.components.BaseUrlTextField
 import ai.foxtouch.ui.overlay.FloatingBubbleService
 import android.view.inputmethod.InputMethodManager
 import android.provider.Settings as AndroidSettings
@@ -111,6 +122,10 @@ fun SettingsScreen(
     var showToolPermissions by remember { mutableStateOf(false) }
     var showDeviceContextPreview by remember { mutableStateOf(false) }
     var showCustomModelDialog by remember { mutableStateOf(false) }
+    var showCompactModelDialog by remember { mutableStateOf(false) }
+    var showCompactPromptEditor by remember { mutableStateOf(false) }
+    var showSkillsSheet by remember { mutableStateOf(false) }
+    val compactModel by viewModel.compactModel.collectAsState()
     var versionTapCount by remember { mutableIntStateOf(0) }
     val providerInfo = getProviderInfo(provider)
 
@@ -229,6 +244,171 @@ fun SettingsScreen(
                 supportingContent = { Text(stringResource(R.string.agent_instructions_desc)) },
                 leadingContent = { Icon(Icons.Default.Terminal, null) },
                 modifier = Modifier.clickable { onNavigateToAgentDocs() },
+            )
+
+            // Context window & compact settings
+            val litellmSyncState by viewModel.litellmSyncState.collectAsState()
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.sync_model_limits)) },
+                supportingContent = {
+                    val desc = when {
+                        litellmSyncState == "syncing" -> stringResource(R.string.syncing)
+                        litellmSyncState?.startsWith("ok") == true -> litellmSyncState!!
+                        litellmSyncState?.startsWith("error") == true -> litellmSyncState!!
+                        else -> stringResource(R.string.sync_model_limits_desc, ModelTokenLimits.runtimeModelCount)
+                    }
+                    Text(desc)
+                },
+                leadingContent = { Icon(Icons.Default.Sync, null) },
+                modifier = Modifier.clickable { viewModel.syncModelLimitsFromLiteLLM() },
+            )
+
+            val customContextWindow by viewModel.customContextWindow.collectAsState()
+            var showContextWindowMenu by remember { mutableStateOf(false) }
+            var showCustomContextInput by remember { mutableStateOf(false) }
+            Box {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.context_window)) },
+                    supportingContent = {
+                        val label = if (customContextWindow == 0) {
+                            val modelCtx = ModelTokenLimits.getContextWindow(model)
+                            stringResource(R.string.context_window_auto, formatTokenCount(modelCtx))
+                        } else {
+                            formatTokenCount(customContextWindow)
+                        }
+                        Text(label)
+                    },
+                    leadingContent = { Icon(Icons.Default.Memory, null) },
+                    modifier = Modifier.clickable { showContextWindowMenu = true },
+                )
+                DropdownMenu(
+                    expanded = showContextWindowMenu,
+                    onDismissRequest = { showContextWindowMenu = false },
+                ) {
+                    ModelTokenLimits.CONTEXT_WINDOW_PRESETS.forEach { (value, label) ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                scope.launch { viewModel.setCustomContextWindow(value) }
+                                showContextWindowMenu = false
+                            },
+                        )
+                    }
+                    HorizontalDivider()
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.custom_value)) },
+                        onClick = {
+                            showContextWindowMenu = false
+                            showCustomContextInput = true
+                        },
+                    )
+                }
+            }
+
+            if (showCustomContextInput) {
+                var inputText by remember { mutableStateOf(if (customContextWindow > 0) customContextWindow.toString() else "") }
+                AlertDialog(
+                    onDismissRequest = { showCustomContextInput = false },
+                    title = { Text(stringResource(R.string.context_window)) },
+                    text = {
+                        OutlinedTextField(
+                            value = inputText,
+                            onValueChange = { inputText = it.filter { c -> c.isDigit() } },
+                            placeholder = { Text(stringResource(R.string.context_window_input_hint)) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            val tokens = inputText.toIntOrNull() ?: 0
+                            scope.launch { viewModel.setCustomContextWindow(tokens) }
+                            showCustomContextInput = false
+                        }) { Text(stringResource(R.string.save)) }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showCustomContextInput = false }) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                    },
+                )
+            }
+
+            val compactThreshold by viewModel.compactThreshold.collectAsState()
+            var showCompactThresholdMenu by remember { mutableStateOf(false) }
+            Box {
+                ListItem(
+                    headlineContent = { Text(stringResource(R.string.compact_threshold)) },
+                    supportingContent = {
+                        val label = if (compactThreshold == 0) {
+                            val effectiveCtx = if (customContextWindow > 0) customContextWindow
+                                else ModelTokenLimits.getContextWindow(model)
+                            val autoThreshold = ModelTokenLimits.defaultThresholdFor(effectiveCtx)
+                            stringResource(R.string.context_window_auto, formatTokenCount(autoThreshold))
+                        } else {
+                            ModelTokenLimits.THRESHOLD_PRESETS.find { it.first == compactThreshold }?.second
+                                ?: formatTokenCount(compactThreshold)
+                        }
+                        Text(label)
+                    },
+                    leadingContent = { Icon(Icons.Default.Speed, null) },
+                    modifier = Modifier.clickable { showCompactThresholdMenu = true },
+                )
+                DropdownMenu(
+                    expanded = showCompactThresholdMenu,
+                    onDismissRequest = { showCompactThresholdMenu = false },
+                ) {
+                    ModelTokenLimits.THRESHOLD_PRESETS.forEach { (value, label) ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                scope.launch { viewModel.setCompactThreshold(value) }
+                                showCompactThresholdMenu = false
+                            },
+                        )
+                    }
+                }
+            }
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.compact_model)) },
+                supportingContent = { Text(compactModel.ifBlank { stringResource(R.string.compact_model_placeholder) }) },
+                leadingContent = { Icon(Icons.Default.SmartToy, null) },
+                modifier = Modifier.clickable { showCompactModelDialog = true },
+            )
+
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.compact_prompt)) },
+                supportingContent = { Text(stringResource(R.string.compact_prompt_desc)) },
+                leadingContent = { Icon(Icons.Default.Terminal, null) },
+                modifier = Modifier.clickable {
+                    viewModel.loadCompactPrompt()
+                    showCompactPromptEditor = true
+                },
+            )
+
+            val autoDeleteTasks by viewModel.autoDeleteTasks.collectAsState()
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.auto_delete_tasks)) },
+                supportingContent = { Text(stringResource(R.string.auto_delete_tasks_desc)) },
+                leadingContent = { Icon(Icons.Default.Checklist, null) },
+                trailingContent = {
+                    Switch(
+                        checked = autoDeleteTasks,
+                        onCheckedChange = { scope.launch { viewModel.setAutoDeleteTasks(it) } },
+                    )
+                },
+            )
+
+            // Skills management
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.skills_title)) },
+                supportingContent = { Text(stringResource(R.string.skills_desc)) },
+                leadingContent = { Icon(Icons.Default.Checklist, null) },
+                modifier = Modifier.clickable {
+                    viewModel.loadSkills()
+                    showSkillsSheet = true
+                },
             )
 
             HorizontalDivider()
@@ -602,6 +782,65 @@ fun SettingsScreen(
             },
         )
     }
+
+    if (showCompactModelDialog) {
+        var compactModelInput by remember { mutableStateOf(compactModel) }
+        AlertDialog(
+            onDismissRequest = { showCompactModelDialog = false },
+            title = { Text(stringResource(R.string.compact_model)) },
+            text = {
+                OutlinedTextField(
+                    value = compactModelInput,
+                    onValueChange = { compactModelInput = it },
+                    placeholder = { Text(stringResource(R.string.compact_model_placeholder)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    scope.launch { viewModel.setCompactModel(compactModelInput.trim()) }
+                    showCompactModelDialog = false
+                }) { Text(stringResource(R.string.save)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCompactModelDialog = false }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
+
+    if (showCompactPromptEditor) {
+        val compactPromptText by viewModel.compactPrompt.collectAsState()
+        CompactPromptEditor(
+            content = compactPromptText,
+            onSave = { viewModel.saveCompactPrompt(it) },
+            onReset = { viewModel.resetCompactPrompt() },
+            onDismiss = { showCompactPromptEditor = false },
+        )
+    }
+
+    if (showSkillsSheet) {
+        val skills by viewModel.skills.collectAsState()
+        SkillsManagementSheet(
+            skills = skills,
+            onReadSkill = { id -> viewModel.readSkill(id) },
+            onCreate = { title, content -> viewModel.createSkill(title, content) },
+            onUpdate = { id, title, content -> viewModel.updateSkill(id, title, content) },
+            onDelete = { id -> viewModel.deleteSkill(id) },
+            onDismiss = { showSkillsSheet = false },
+        )
+    }
+}
+
+/** Format token count for display: e.g. 128000 → "128K", 1048576 → "1.05M" */
+private fun formatTokenCount(tokens: Int): String = when {
+    tokens >= 1_000_000 -> {
+        val m = tokens / 1_000_000.0
+        val formatted = "%.2f".format(m).trimEnd('0').trimEnd('.')
+        "${formatted}M"
+    }
+    tokens >= 1_000 -> "${tokens / 1_000}K"
+    else -> "$tokens"
 }
 
 @Composable
@@ -649,15 +888,12 @@ private fun ProviderConfigDialog(
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(Modifier.height(12.dp))
-                OutlinedTextField(
+                BaseUrlTextField(
                     value = baseUrl,
                     onValueChange = { baseUrl = it },
-                    label = { Text(stringResource(R.string.base_url)) },
-                    placeholder = { Text(stringResource(R.string.base_url_placeholder)) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
+                    leadingIcon = null,
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(4.dp))
                 OutlinedTextField(
                     value = proxy,
                     onValueChange = { proxy = it },
@@ -972,15 +1208,10 @@ private fun ModelList(
             ListItem(
                 headlineContent = {
                     Text(
-                        text = m.displayName + when {
-                            m.recommended -> " *"
-                            m.warning != null -> " (!)"
-                            else -> ""
-                        },
+                        text = m.displayName + if (m.warning != null) " (!)" else "",
                         color = when {
                             isSelected -> MaterialTheme.colorScheme.primary
                             m.warning != null -> MaterialTheme.colorScheme.error
-                            m.recommended -> MaterialTheme.colorScheme.primary
                             else -> MaterialTheme.colorScheme.onSurface
                         },
                     )
@@ -1220,6 +1451,226 @@ private fun AppPickerDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CompactPromptEditor(
+    content: String,
+    onSave: (String) -> Unit,
+    onReset: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var text by remember { mutableStateOf(content) }
+
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.compact_prompt),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                TextButton(onClick = {
+                    onReset()
+                    onDismiss()
+                }) { Text(stringResource(R.string.reset_to_default)) }
+            }
+            Spacer(Modifier.height(8.dp))
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+            ) {
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+                Spacer(Modifier.width(8.dp))
+                Button(onClick = {
+                    onSave(text)
+                    onDismiss()
+                }) { Text(stringResource(R.string.save)) }
+            }
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SkillsManagementSheet(
+    skills: List<SkillSummary>,
+    onReadSkill: (String) -> String?,
+    onCreate: (String, String) -> Unit,
+    onUpdate: (String, String, String) -> Unit,
+    onDelete: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var editingSkill by remember { mutableStateOf<Triple<String?, String, String>?>(null) }
+    var deleteConfirmId by remember { mutableStateOf<String?>(null) }
+
+    if (deleteConfirmId != null) {
+        AlertDialog(
+            onDismissRequest = { deleteConfirmId = null },
+            title = { Text(stringResource(R.string.delete_skill)) },
+            text = { Text(stringResource(R.string.delete_skill_confirm)) },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        deleteConfirmId?.let { onDelete(it) }
+                        deleteConfirmId = null
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                ) { Text(stringResource(R.string.delete_all)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteConfirmId = null }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
+
+    if (editingSkill != null) {
+        val (id, initialTitle, initialContent) = editingSkill!!
+        SkillEditorDialog(
+            initialTitle = initialTitle,
+            initialContent = initialContent,
+            isNew = id == null,
+            onSave = { title, content ->
+                if (id == null) onCreate(title, content) else onUpdate(id, title, content)
+                editingSkill = null
+            },
+            onDelete = if (id != null) {
+                { deleteConfirmId = id; editingSkill = null }
+            } else null,
+            onDismiss = { editingSkill = null },
+        )
+        return
+    }
+
+    ModalBottomSheet(onDismissRequest = onDismiss) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.skills_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                IconButton(onClick = { editingSkill = Triple(null, "", "") }) {
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.new_skill))
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+
+            if (skills.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.no_skills_yet),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 16.dp),
+                )
+            } else {
+                skills.forEach { skill ->
+                    ListItem(
+                        headlineContent = { Text(skill.title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                        supportingContent = {
+                            Text(skill.preview, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodySmall)
+                        },
+                        modifier = Modifier.clickable {
+                            val content = onReadSkill(skill.id) ?: ""
+                            val lines = content.lines()
+                            val title = lines.firstOrNull()?.removePrefix("# ")?.trim() ?: skill.title
+                            val body = lines.drop(1).joinToString("\n").trimStart()
+                            editingSkill = Triple(skill.id, title, body)
+                        },
+                        trailingContent = {
+                            IconButton(onClick = { deleteConfirmId = skill.id }) {
+                                Icon(Icons.Default.Delete, null, modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.error)
+                            }
+                        },
+                    )
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun SkillEditorDialog(
+    initialTitle: String,
+    initialContent: String,
+    isNew: Boolean,
+    onSave: (String, String) -> Unit,
+    onDelete: (() -> Unit)?,
+    onDismiss: () -> Unit,
+) {
+    var title by remember { mutableStateOf(initialTitle) }
+    var content by remember { mutableStateOf(initialContent) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(if (isNew) R.string.new_skill else R.string.edit_skill)) },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text(stringResource(R.string.skill_title_label)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = content,
+                    onValueChange = { content = it },
+                    label = { Text(stringResource(R.string.skill_content_label)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 200.dp),
+                    textStyle = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = { onSave(title, content) },
+                enabled = title.isNotBlank(),
+            ) { Text(stringResource(R.string.save)) }
+        },
+        dismissButton = {
+            Row {
+                if (onDelete != null) {
+                    TextButton(onClick = onDelete) {
+                        Text(stringResource(R.string.delete_skill), color = MaterialTheme.colorScheme.error)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                }
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+            }
         },
     )
 }

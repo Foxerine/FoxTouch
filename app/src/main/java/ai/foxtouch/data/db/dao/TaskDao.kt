@@ -13,6 +13,9 @@ interface TaskDao {
     @Insert
     suspend fun insert(task: TaskEntity)
 
+    @Insert
+    suspend fun insertAll(tasks: List<TaskEntity>)
+
     @Update
     suspend fun update(task: TaskEntity)
 
@@ -30,6 +33,9 @@ interface TaskDao {
 
     @Query("DELETE FROM tasks WHERE id = :id")
     suspend fun deleteById(id: String)
+
+    @Query("DELETE FROM tasks WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<String>)
 
     @Query("SELECT COALESCE(MAX(sortOrder), 0) FROM tasks WHERE sessionId = :sessionId")
     suspend fun getMaxSortOrder(sessionId: String): Int

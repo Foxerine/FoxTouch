@@ -20,6 +20,7 @@ class AgentDocsManager @Inject constructor(
 
     val memoryFile: File get() = File(docsDir, "memory.md")
     val agentsFile: File get() = File(docsDir, "agents.md")
+    private val compactPromptFile: File get() = File(docsDir, "compact_prompt.md")
 
     fun readMemory(): String =
         memoryFile.takeIf { it.exists() }?.readText() ?: ""
@@ -33,5 +34,13 @@ class AgentDocsManager @Inject constructor(
 
     fun writeAgents(content: String) {
         agentsFile.writeText(content)
+    }
+
+    fun readCompactPrompt(): String =
+        compactPromptFile.takeIf { it.exists() }?.readText()
+            ?: ContextCompactor.DEFAULT_COMPACT_PROMPT
+
+    fun writeCompactPrompt(content: String) {
+        compactPromptFile.writeText(content)
     }
 }

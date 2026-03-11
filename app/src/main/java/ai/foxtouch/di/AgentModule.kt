@@ -1,10 +1,12 @@
 package ai.foxtouch.di
 
 import android.content.Context
+import ai.foxtouch.agent.AgentDocsManager
 import ai.foxtouch.agent.AgentRunner
 import ai.foxtouch.agent.DeviceContext
 import ai.foxtouch.data.preferences.ApiKeyStore
 import ai.foxtouch.data.preferences.AppSettings
+import ai.foxtouch.data.repository.SessionRepository
 import ai.foxtouch.data.repository.TaskRepository
 import ai.foxtouch.permission.PermissionStore
 import ai.foxtouch.tools.ToolRegistry
@@ -39,5 +41,7 @@ object AgentModule {
         toolRegistry: ToolRegistry,
         deviceContext: DeviceContext,
         taskRepository: TaskRepository,
-    ): AgentRunner = AgentRunner(appContext, applicationScope, httpClient, json, apiKeyStore, appSettings, toolRegistry, deviceContext, taskRepository)
+        sessionRepository: SessionRepository,
+        agentDocsManager: AgentDocsManager,
+    ): AgentRunner = AgentRunner(appContext, applicationScope, httpClient, json, apiKeyStore, appSettings, toolRegistry, deviceContext, taskRepository, sessionRepository, agentDocsManager)
 }

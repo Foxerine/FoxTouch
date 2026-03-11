@@ -97,6 +97,7 @@ fun OverlayBar(
     onCompletionReject: (String) -> Unit = {},
     onCompletionDismiss: () -> Unit = {},
     showCompletionSuccess: Boolean = false,
+    contextUsagePercent: Int? = null,
     onDragDelta: (Float) -> Unit = {},
     onDragReset: () -> Unit = {},
 ) {
@@ -171,6 +172,17 @@ fun OverlayBar(
                             MaterialTheme.colorScheme.onSurface
                         },
                     )
+                }
+
+                // Compact warning when remaining <= 15%
+                if (contextUsagePercent != null && contextUsagePercent <= 15) {
+                    Text(
+                        text = stringResource(R.string.compact_warning, contextUsagePercent),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error,
+                        maxLines = 1,
+                    )
+                    Spacer(Modifier.width(4.dp))
                 }
 
                 // Agent mode toggle

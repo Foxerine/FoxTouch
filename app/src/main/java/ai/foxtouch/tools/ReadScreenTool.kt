@@ -12,6 +12,7 @@ import ai.foxtouch.accessibility.ScreenCaptureManager
 import ai.foxtouch.agent.ToolDefinition
 import ai.foxtouch.data.preferences.AppSettings
 import ai.foxtouch.data.preferences.ScreenshotMode
+import kotlinx.coroutines.delay
 import kotlinx.serialization.json.JsonObject
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -36,6 +37,8 @@ class ReadScreenTool(
             boolean("show_labels", "Show element text and class name labels next to boundaries. Requires show_elements=true (default false)")
             boolean("clickable_only", "Only annotate interactive elements (clickable, scrollable, editable). Requires show_elements=true (default false)")
             boolean("save_to_gallery", "Save the screenshot (without annotations) to the device's photo gallery (default false)")
+            int("wait_ms", "Wait this many milliseconds before reading the screen (default 0, max 10000). " +
+                "Useful for waiting for animations, page loads, or network operations to complete.")
         },
     )
 
@@ -49,6 +52,9 @@ class ReadScreenTool(
         val showLabels = args.optionalBoolean("show_labels", false)
         val clickableOnly = args.optionalBoolean("clickable_only", false)
         val saveToGallery = args.optionalBoolean("save_to_gallery", false)
+        val waitMs = args.optionalLong("wait_ms", 0L).coerceIn(0, 10_000)
+
+        if (waitMs > 0) delay(waitMs)
 
         val uiTree = AccessibilityBridge.readUITree()
         val result = StringBuilder()

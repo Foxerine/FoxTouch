@@ -61,6 +61,14 @@ class SkillsManager @Inject constructor(
         return id
     }
 
+    fun updateSkill(id: String, title: String, content: String): Boolean {
+        val file = File(skillsDir, "$id.md")
+        if (!file.exists()) return false
+        val fullContent = "# $title\n\n${content.trimStart()}"
+        file.writeText(fullContent)
+        return true
+    }
+
     fun deleteSkill(id: String): Boolean {
         val file = File(skillsDir, "$id.md")
         return file.delete()

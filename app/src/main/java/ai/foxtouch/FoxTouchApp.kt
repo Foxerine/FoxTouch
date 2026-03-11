@@ -3,6 +3,7 @@ package ai.foxtouch
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import ai.foxtouch.agent.ModelTokenLimits
 import ai.foxtouch.data.preferences.AppSettings
 import ai.foxtouch.tools.ToolDisplayRegistry
 import com.google.crypto.tink.aead.AeadConfig
@@ -28,6 +29,9 @@ class FoxTouchApp : Application() {
         AeadConfig.register()
         ToolDisplayRegistry.init(this)
         registerActivityLifecycleCallbacks(ForegroundTracker)
+
+        // Load cached runtime model context windows from disk
+        ModelTokenLimits.loadFromDisk(this)
 
         // Migrate legacy global base_url/proxy to per-provider keys
         appScope.launch { appSettings.migrateGlobalNetworkSettings() }

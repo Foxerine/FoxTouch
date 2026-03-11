@@ -21,6 +21,10 @@ interface MessageDao {
     @Query("SELECT * FROM messages WHERE sessionId = :sessionId ORDER BY timestamp ASC")
     suspend fun getBySessionOnce(sessionId: String): List<MessageEntity>
 
+    @Query("""SELECT COALESCE(SUM(LENGTH(content) + COALESCE(LENGTH(toolArgsJson), 0)
+        + COALESCE(LENGTH(toolResultJson), 0)), 0) FROM messages WHERE sessionId = :sessionId""")
+    suspend fun getSessionContentSize(sessionId: String): Long
+
     @Query("DELETE FROM messages WHERE sessionId = :sessionId")
     suspend fun deleteBySession(sessionId: String)
 }

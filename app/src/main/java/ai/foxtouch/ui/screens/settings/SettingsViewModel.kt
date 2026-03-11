@@ -2,10 +2,15 @@ package ai.foxtouch.ui.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ai.foxtouch.agent.AgentDocsManager
+import ai.foxtouch.agent.ContextCompactor
 import ai.foxtouch.agent.DeviceContext
 import ai.foxtouch.agent.ModelInfo
+import ai.foxtouch.agent.SkillSummary
+import ai.foxtouch.agent.SkillsManager
 import android.util.Log
 import ai.foxtouch.agent.AVAILABLE_PROVIDERS
+import ai.foxtouch.agent.ModelTokenLimits
 import ai.foxtouch.agent.classifyClaudeModel
 import ai.foxtouch.agent.classifyGeminiModel
 import ai.foxtouch.agent.classifyOpenAIModel
@@ -35,7 +40,10 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
+import dagger.hilt.android.qualifiers.ApplicationContext
+import android.content.Context
 import javax.inject.Inject
 
 /** Model list fetch result — sealed state for clear UI rendering. */
@@ -54,10 +62,15 @@ class SettingsViewModel @Inject constructor(
     private val json: Json,
     private val deviceContext: DeviceContext,
     val permissionStore: PermissionStore,
+    private val skillsManager: SkillsManager,
+    private val agentDocsManager: AgentDocsManager,
+    @ApplicationContext private val appContext: Context,
 ) : ViewModel() {
 
     companion object {
         private const val TAG = "SettingsViewModel"
+        private const val LITELLM_URL =
+            "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json"
     }
 
     val provider: StateFlow<String> = appSettings.provider
@@ -119,6 +132,78 @@ class SettingsViewModel @Inject constructor(
 
     val mediaProjectionApps: StateFlow<Set<String>> = appSettings.getMediaProjectionApps()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
+
+    // ── Compact settings ────────────────────────────────────────────
+    val compactThreshold: StateFlow<Int> = appSettings.compactThreshold
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 0)
+
+    val compactModel: StateFlow<String> = appSettings.compactModel
+        .stateIn(viewModelScope, SharingStarted.Eagerly, "")
+
+    val customContextWindow: StateFlow<Int> = appSettings.customContextWindow
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 0)
+
+    val autoDeleteTasks: StateFlow<Boolean> = appSettings.isAutoDeleteTasksOnCompletion
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    private val _compactPrompt = MutableStateFlow("")
+    val compactPrompt: StateFlow<String> = _compactPrompt.asStateFlow()
+
+    fun loadCompactPrompt() {
+        _compactPrompt.value = agentDocsManager.readCompactPrompt()
+    }
+
+    fun saveCompactPrompt(content: String) {
+        agentDocsManager.writeCompactPrompt(content)
+        _compactPrompt.value = content
+    }
+
+    fun resetCompactPrompt() {
+        val defaultPrompt = ContextCompactor.DEFAULT_COMPACT_PROMPT
+        agentDocsManager.writeCompactPrompt(defaultPrompt)
+        _compactPrompt.value = defaultPrompt
+    }
+
+    suspend fun setCompactThreshold(threshold: Int) {
+        appSettings.setCompactThreshold(threshold)
+    }
+
+    suspend fun setCompactModel(model: String) {
+        appSettings.setCompactModel(model)
+    }
+
+    suspend fun setCustomContextWindow(tokens: Int) {
+        appSettings.setCustomContextWindow(tokens)
+    }
+
+    suspend fun setAutoDeleteTasks(enabled: Boolean) {
+        appSettings.setAutoDeleteTasksOnCompletion(enabled)
+    }
+
+    // ── Skills management ───────────────────────────────────────────
+    private val _skills = MutableStateFlow<List<SkillSummary>>(emptyList())
+    val skills: StateFlow<List<SkillSummary>> = _skills.asStateFlow()
+
+    fun loadSkills() {
+        _skills.value = skillsManager.listSkills()
+    }
+
+    fun readSkill(id: String): String? = skillsManager.readSkill(id)
+
+    fun createSkill(title: String, content: String) {
+        skillsManager.saveSkill(title, content)
+        loadSkills()
+    }
+
+    fun updateSkill(id: String, title: String, content: String) {
+        skillsManager.updateSkill(id, title, content)
+        loadSkills()
+    }
+
+    fun deleteSkill(id: String) {
+        skillsManager.deleteSkill(id)
+        loadSkills()
+    }
 
     suspend fun setProvider(provider: String) {
         _modelListState.value = ModelListState.Idle
@@ -306,6 +391,8 @@ class SettingsViewModel @Inject constructor(
                 }
 
                 Log.d(TAG, "Fetched ${models.size} models for $targetProvider")
+                // Persist any runtime-discovered context windows (e.g. Gemini inputTokenLimit)
+                if (targetProvider == "gemini") saveRuntimeModelData()
                 _modelListState.value = if (models.isNotEmpty()) {
                     ModelListState.Success(models)
                 } else {
@@ -366,7 +453,13 @@ class SettingsViewModel @Inject constructor(
             val methods = obj["supportedGenerationMethods"]?.jsonArray
                 ?.map { it.jsonPrimitive.content } ?: emptyList()
             if ("generateContent" !in methods) return@mapNotNull null
-            ModelInfo(id = name.removePrefix("models/"), displayName = displayName)
+            // Extract context window from API response
+            val inputTokenLimit = obj["inputTokenLimit"]?.jsonPrimitive?.int
+            val modelId = name.removePrefix("models/")
+            if (inputTokenLimit != null && inputTokenLimit > 0) {
+                ModelTokenLimits.putRuntime(modelId, inputTokenLimit)
+            }
+            ModelInfo(id = modelId, displayName = displayName)
         }.map { classifyGeminiModel(it) }.sortedBy { it.displayName }
     }
 
@@ -407,5 +500,48 @@ class SettingsViewModel @Inject constructor(
             val displayName = obj["display_name"]?.jsonPrimitive?.content ?: id
             ModelInfo(id = id, displayName = displayName)
         }.map { classifyClaudeModel(it) }.sortedBy { it.displayName }
+    }
+
+    // ── litellm context window sync ────────────────────────────────
+
+    private val _litellmSyncState = MutableStateFlow<String?>(null)
+    val litellmSyncState: StateFlow<String?> = _litellmSyncState.asStateFlow()
+
+    /**
+     * Fetch model context windows from litellm's curated JSON database.
+     * Updates runtime model data and persists to disk.
+     */
+    fun syncModelLimitsFromLiteLLM() {
+        viewModelScope.launch {
+            _litellmSyncState.value = "syncing"
+            try {
+                val client = buildModelFetchClient("openai") // reuse proxy if any
+                val isOwnedClient = client !== httpClient
+                try {
+                    val response = client.get(LITELLM_URL)
+                    val body = response.bodyAsText()
+                    val status = response.status.value
+                    if (status !in 200..299) {
+                        _litellmSyncState.value = "error: HTTP $status"
+                        return@launch
+                    }
+                    val rootObj = json.parseToJsonElement(body).jsonObject
+                    val count = ModelTokenLimits.parseLiteLLMJson(rootObj)
+                    ModelTokenLimits.saveToDisk(appContext)
+                    _litellmSyncState.value = "ok: $count models"
+                    Log.d(TAG, "litellm sync complete: $count models")
+                } finally {
+                    if (isOwnedClient) client.close()
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "litellm sync failed", e)
+                _litellmSyncState.value = "error: ${e.message}"
+            }
+        }
+    }
+
+    /** Save runtime model data after fetching models from any API. */
+    private fun saveRuntimeModelData() {
+        ModelTokenLimits.saveToDisk(appContext)
     }
 }

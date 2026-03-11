@@ -17,7 +17,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
         MessageEntity::class,
         TaskEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class FoxTouchDatabase : RoomDatabase() {
@@ -29,6 +29,12 @@ abstract class FoxTouchDatabase : RoomDatabase() {
         val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE tasks ADD COLUMN sortOrder INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE sessions ADD COLUMN lastTokenCount INTEGER NOT NULL DEFAULT 0")
             }
         }
     }

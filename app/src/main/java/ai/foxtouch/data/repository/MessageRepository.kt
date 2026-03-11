@@ -45,6 +45,8 @@ class MessageRepository @Inject constructor(
         return message
     }
 
+    suspend fun getSessionContentSize(sessionId: String): Long = messageDao.getSessionContentSize(sessionId)
+
     suspend fun deleteBySession(sessionId: String) = messageDao.deleteBySession(sessionId)
 
     suspend fun addToolMessage(

@@ -142,7 +142,7 @@ class FloatingBubbleService : Service() {
                     }
                     is AgentState.AskingUser -> mainHandler.post {
                         isExpanded = true
-                        updateFocusability(true)
+                        updateFocusability(true, touchPassThrough = true)
                         if (!FoxTouchApp.ForegroundTracker.isForeground.value) {
                             showPanel()
                         }
@@ -155,16 +155,25 @@ class FloatingBubbleService : Service() {
         }
     }
 
-    /** Toggle FLAG_NOT_FOCUSABLE to allow/disallow keyboard input in the overlay. */
-    private fun updateFocusability(focusable: Boolean) {
-        if (needsInput == focusable) return
-        needsInput = focusable
+    /**
+     * Toggle FLAG_NOT_FOCUSABLE to allow/disallow keyboard input in the overlay.
+     * When [touchPassThrough] is true, FLAG_NOT_TOUCH_MODAL is added so touches
+     * outside the overlay bounds pass through to the app behind it.
+     */
+    private fun updateFocusability(focusable: Boolean, touchPassThrough: Boolean = false) {
         val params = panelParams ?: return
         if (focusable) {
             params.flags = params.flags and WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE.inv()
+            if (touchPassThrough) {
+                params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+            } else {
+                params.flags = params.flags and WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL.inv()
+            }
         } else {
             params.flags = params.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+            // FLAG_NOT_TOUCH_MODAL is implicit when FLAG_NOT_FOCUSABLE is set
         }
+        needsInput = focusable
         panelView?.let {
             try { windowManager?.updateViewLayout(it, params) } catch (_: Exception) {}
         }
@@ -264,6 +273,7 @@ class FloatingBubbleService : Service() {
                     val isBusy by agentRunner.isBusy.collectAsState()
                     val agentMode by appSettings.agentMode.collectAsState(initial = AgentMode.NORMAL)
                     val tasks by agentRunner.sessionTasks.collectAsState()
+                    val contextUsage by agentRunner.contextUsage.collectAsState()
                     val taskProgress = remember(tasks) {
                         TaskProgress(
                             total = tasks.size,
@@ -312,6 +322,7 @@ class FloatingBubbleService : Service() {
                             agentRunner.respondToUserQuestion(answer)
                         },
                         showCompletionSuccess = showCompletionSuccess,
+                        contextUsagePercent = contextUsage?.remainingPercent,
                         onCompletionConfirm = {
                             agentRunner.respondToCompletion(CompletionResponse.Confirmed)
                             showCompletionSuccess = true

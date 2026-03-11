@@ -218,24 +218,56 @@ object ToolDisplayRegistry {
         "create_task" to ToolDisplayInfo(
             displayName = "Create Task",
             formatArgs = { args ->
-                val title = args["title"]?.jsonPrimitive?.content ?: ""
-                "Create task: $title"
+                val tasks = args["tasks"] as? kotlinx.serialization.json.JsonArray
+                if (tasks != null) {
+                    if (tasks.size == 1) {
+                        val title = (tasks[0] as? JsonObject)?.get("title")?.jsonPrimitive?.content ?: ""
+                        "Create task: $title"
+                    } else "Create ${tasks.size} tasks"
+                } else {
+                    val title = args["title"]?.jsonPrimitive?.content ?: ""
+                    "Create task: $title"
+                }
             },
             approvalMessage = { args ->
-                val title = args["title"]?.jsonPrimitive?.content ?: ""
-                "FoxTouch wants to create a task: $title"
+                val tasks = args["tasks"] as? kotlinx.serialization.json.JsonArray
+                if (tasks != null && tasks.size > 1) {
+                    "FoxTouch wants to create ${tasks.size} tasks."
+                } else {
+                    val title = args["title"]?.jsonPrimitive?.content
+                        ?: (args["tasks"] as? kotlinx.serialization.json.JsonArray)
+                            ?.firstOrNull()?.let { (it as? JsonObject)?.get("title")?.jsonPrimitive?.content }
+                        ?: ""
+                    "FoxTouch wants to create a task: $title"
+                }
             },
         ),
         "update_task" to ToolDisplayInfo(
             displayName = "Update Task",
             formatArgs = { args ->
-                val status = args["status"]?.jsonPrimitive?.content ?: ""
-                if (status == "deleted") "Delete task" else "Update task → $status"
+                val updates = args["updates"] as? kotlinx.serialization.json.JsonArray
+                if (updates != null) {
+                    if (updates.size == 1) {
+                        val status = (updates[0] as? JsonObject)?.get("status")?.jsonPrimitive?.content ?: ""
+                        if (status == "deleted") "Delete task" else "Update task → $status"
+                    } else "Update ${updates.size} tasks"
+                } else {
+                    val status = args["status"]?.jsonPrimitive?.content ?: ""
+                    if (status == "deleted") "Delete task" else "Update task → $status"
+                }
             },
             approvalMessage = { args ->
-                val status = args["status"]?.jsonPrimitive?.content ?: ""
-                if (status == "deleted") "FoxTouch wants to delete a task."
-                else "FoxTouch wants to mark a task as $status."
+                val updates = args["updates"] as? kotlinx.serialization.json.JsonArray
+                if (updates != null && updates.size > 1) {
+                    "FoxTouch wants to update ${updates.size} tasks."
+                } else {
+                    val status = args["status"]?.jsonPrimitive?.content
+                        ?: (args["updates"] as? kotlinx.serialization.json.JsonArray)
+                            ?.firstOrNull()?.let { (it as? JsonObject)?.get("status")?.jsonPrimitive?.content }
+                        ?: ""
+                    if (status == "deleted") "FoxTouch wants to delete a task."
+                    else "FoxTouch wants to mark a task as $status."
+                }
             },
         ),
         "ask_user" to ToolDisplayInfo(

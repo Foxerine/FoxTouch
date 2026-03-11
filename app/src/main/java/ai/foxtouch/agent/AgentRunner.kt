@@ -9,6 +9,7 @@ import ai.foxtouch.data.db.entity.TaskEntity
 import ai.foxtouch.data.preferences.AgentMode
 import ai.foxtouch.data.preferences.ApiKeyStore
 import ai.foxtouch.data.preferences.AppSettings
+import ai.foxtouch.data.repository.SessionRepository
 import ai.foxtouch.data.repository.TaskRepository
 import ai.foxtouch.di.ApplicationScope
 import ai.foxtouch.permission.PermissionPolicy
@@ -114,6 +115,8 @@ class AgentRunner @Inject constructor(
     private val toolRegistry: ToolRegistry,
     private val deviceContext: DeviceContext,
     private val taskRepository: TaskRepository,
+    private val sessionRepository: SessionRepository,
+    private val agentDocsManager: AgentDocsManager,
 ) {
     companion object {
         private const val TAG = "FoxTouch.Agent"
@@ -141,6 +144,11 @@ class AgentRunner @Inject constructor(
 
     private val _logFlow = MutableSharedFlow<LogEntry>(replay = 256, extraBufferCapacity = 64)
     val logFlow: SharedFlow<LogEntry> = _logFlow.asSharedFlow()
+
+    data class ContextUsage(val usedTokens: Int, val threshold: Int, val remainingPercent: Int)
+    private var lastPromptTokens: Int = 0
+    private val _contextUsage = MutableStateFlow<ContextUsage?>(null)
+    val contextUsage: StateFlow<ContextUsage?> = _contextUsage.asStateFlow()
 
     private val _currentSessionId = MutableStateFlow<String?>(null)
     val currentSessionId: String? get() = _currentSessionId.value
@@ -237,6 +245,8 @@ class AgentRunner @Inject constructor(
 
     fun clearHistory() {
         conversationHistory.clear()
+        lastPromptTokens = 0
+        _contextUsage.value = null
     }
 
     /** Show a highlight border around the target element for click approval preview. */
@@ -419,6 +429,27 @@ class AgentRunner @Inject constructor(
         }
     }
 
+    private suspend fun performCompaction(provider: LLMProvider, currentModel: String): String? {
+        val compactModel = appSettings.getCompactModelOnce().ifBlank { currentModel }
+        val compactPrompt = agentDocsManager.readCompactPrompt()
+        val conversationText = ContextCompactor.formatConversationForSummary(conversationHistory)
+        val messages = listOf(
+            ChatMessage(role = "system", content = compactPrompt),
+            ChatMessage(role = "user", content = conversationText),
+        )
+        return try {
+            val sb = StringBuilder()
+            provider.chat(messages, emptyList(), compactModel, streaming = false, thinking = false).collect { event ->
+                if (event is LLMEvent.TextDelta) sb.append(event.text)
+            }
+            val summary = sb.toString()
+            if (summary.isBlank()) null else summary
+        } catch (e: Exception) {
+            agentLog("Compaction failed: ${e.message}", LogLevel.ERROR)
+            null
+        }
+    }
+
     private suspend fun runTurnInternal(
         userMessage: String,
         isPlanMode: Boolean,
@@ -488,6 +519,13 @@ class AgentRunner @Inject constructor(
                     when (event) {
                         is LLMEvent.TextDelta -> textBuffer.append(event.text)
                         is LLMEvent.ToolCallRequest -> allToolCalls.addAll(event.calls)
+                        is LLMEvent.Usage -> {
+                            agentLog("Usage: ${event.promptTokens} prompt, ${event.completionTokens} completion, ${event.totalTokens} total")
+                            lastPromptTokens = event.promptTokens
+                            _currentSessionId.value?.let { sid ->
+                                applicationScope.launch { sessionRepository.updateTokenCount(sid, event.promptTokens) }
+                            }
+                        }
                         is LLMEvent.Error -> {
                             agentLog("LLM error: ${event.message}", LogLevel.ERROR)
                             llmError = event.message
@@ -653,8 +691,46 @@ class AgentRunner @Inject constructor(
             // don't give the LLM another turn to generate more actions.
             if (taskConfirmedThisTurn) {
                 agentLog("User confirmed completion — stopping", LogLevel.INFO)
+                if (appSettings.getAutoDeleteTasksOnCompletionOnce()) {
+                    _currentSessionId.value?.let { sessionId ->
+                        taskRepository.deleteBySession(sessionId)
+                        agentLog("Auto-deleted tasks for session $sessionId", LogLevel.INFO)
+                    }
+                }
                 _state.value = AgentState.Idle
                 return
+            }
+
+            // ── Context compaction check ──
+            val effectivePromptTokens = if (lastPromptTokens > 0) lastPromptTokens
+                else ContextCompactor.estimateTokens(conversationHistory)
+            val userThreshold = appSettings.getCompactThresholdOnce()
+            val customCtxWindow = appSettings.getCustomContextWindowOnce()
+            val compactThreshold = if (userThreshold > 0) userThreshold
+                else ModelTokenLimits.getDefaultThreshold(model, customCtxWindow)
+            val remaining = ((1.0 - effectivePromptTokens.toDouble() / compactThreshold) * 100).toInt().coerceAtLeast(0)
+            _contextUsage.value = ContextUsage(effectivePromptTokens, compactThreshold, remaining)
+
+            if (effectivePromptTokens >= compactThreshold && conversationHistory.size > 3) {
+                agentLog("Context compaction triggered: $effectivePromptTokens / $compactThreshold tokens", LogLevel.INFO)
+                val summary = performCompaction(provider, model)
+                if (summary != null) {
+                    conversationHistory.clear()
+                    val deviceContextBlock = deviceContext.gather()
+                    val basePrompt = SystemPrompts.buildAgentSystemPrompt(deviceContextBlock)
+                    val systemPrompt = if (effectivePlanMode) {
+                        basePrompt + "\n\n" + SystemPrompts.PLAN_MODE_PROMPT
+                    } else {
+                        basePrompt
+                    }
+                    conversationHistory.add(ChatMessage(role = "system", content = systemPrompt))
+                    conversationHistory.add(ChatMessage(role = "user", content = ContextCompactor.buildContinuationMessage(summary)))
+                    lastPromptTokens = 0
+                    _contextUsage.value = null
+                    onOutput(AgentOutput.Text("[Context compacted]"))
+                    agentLog("Compaction complete, resuming with ${conversationHistory.size} messages", LogLevel.INFO)
+                    continue
+                }
             }
 
             // Check if AI proactively entered plan mode

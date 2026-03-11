@@ -57,6 +57,10 @@ class AppSettings @Inject constructor(
         private val KEY_OVERLAY_ENABLED = booleanPreferencesKey("overlay_enabled")
         private val KEY_APP_LANGUAGE = stringPreferencesKey("app_language")
         private val KEY_THINKING_ENABLED = booleanPreferencesKey("thinking_enabled")
+        private val KEY_COMPACT_THRESHOLD = intPreferencesKey("compact_threshold")
+        private val KEY_COMPACT_MODEL = stringPreferencesKey("compact_model")
+        private val KEY_CUSTOM_CONTEXT_WINDOW = intPreferencesKey("custom_context_window")
+        private val KEY_AUTO_DELETE_TASKS = booleanPreferencesKey("auto_delete_tasks_on_completion")
 
         // Per-provider key patterns
         private fun providerBaseUrlKey(providerId: String) =
@@ -88,6 +92,13 @@ class AppSettings @Inject constructor(
     val isOverlayEnabled: Flow<Boolean> = dataStore.data.map { it[KEY_OVERLAY_ENABLED] ?: true }
     val appLanguage: Flow<String> = dataStore.data.map { it[KEY_APP_LANGUAGE] ?: "" }
     val isThinkingEnabled: Flow<Boolean> = dataStore.data.map { it[KEY_THINKING_ENABLED] ?: true }
+    /** Compact threshold in tokens. 0 = auto (based on model). */
+    val compactThreshold: Flow<Int> = dataStore.data.map { it[KEY_COMPACT_THRESHOLD] ?: 0 }
+    /** Model to use for compaction. Empty = use current model. */
+    val compactModel: Flow<String> = dataStore.data.map { it[KEY_COMPACT_MODEL] ?: "" }
+    /** Custom context window in tokens. 0 = auto (use model default from ModelTokenLimits). */
+    val customContextWindow: Flow<Int> = dataStore.data.map { it[KEY_CUSTOM_CONTEXT_WINDOW] ?: 0 }
+    val isAutoDeleteTasksOnCompletion: Flow<Boolean> = dataStore.data.map { it[KEY_AUTO_DELETE_TASKS] ?: false }
 
     suspend fun setProvider(provider: String) {
         dataStore.edit { it[KEY_PROVIDER] = provider }
@@ -215,6 +226,22 @@ class AppSettings @Inject constructor(
         dataStore.edit { it[KEY_THINKING_ENABLED] = enabled }
     }
 
+    suspend fun setCompactThreshold(threshold: Int) {
+        dataStore.edit { it[KEY_COMPACT_THRESHOLD] = threshold.coerceAtLeast(0) }
+    }
+
+    suspend fun setCompactModel(model: String) {
+        dataStore.edit { it[KEY_COMPACT_MODEL] = model.trim() }
+    }
+
+    suspend fun setCustomContextWindow(tokens: Int) {
+        dataStore.edit { it[KEY_CUSTOM_CONTEXT_WINDOW] = tokens.coerceAtLeast(0) }
+    }
+
+    suspend fun setAutoDeleteTasksOnCompletion(enabled: Boolean) {
+        dataStore.edit { it[KEY_AUTO_DELETE_TASKS] = enabled }
+    }
+
     suspend fun getProviderOnce(): String = provider.first()
     suspend fun getModelOnce(): String = model.first()
     suspend fun getAgentModeOnce(): AgentMode = agentMode.first()
@@ -226,6 +253,10 @@ class AppSettings @Inject constructor(
     suspend fun getMaxIterationsOnce(): Int = maxIterations.first()
     suspend fun getOverlayEnabledOnce(): Boolean = isOverlayEnabled.first()
     suspend fun getThinkingEnabledOnce(): Boolean = isThinkingEnabled.first()
+    suspend fun getCompactThresholdOnce(): Int = compactThreshold.first()
+    suspend fun getCompactModelOnce(): String = compactModel.first()
+    suspend fun getCustomContextWindowOnce(): Int = customContextWindow.first()
+    suspend fun getAutoDeleteTasksOnCompletionOnce(): Boolean = isAutoDeleteTasksOnCompletion.first()
 
     // --- Per-app screenshot mode (MediaProjection fallback for apps that block A11y screenshots) ---
 

@@ -11,6 +11,7 @@ data class SessionEntity(
     val title: String = "New Session",
     val provider: String = "gemini",
     val model: String = "gemini-2.5-flash",
+    val lastTokenCount: Int = 0,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
 )

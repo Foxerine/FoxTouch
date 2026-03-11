@@ -82,6 +82,8 @@ class ClaudeProvider(
         }
 
         val toolUseBlocks = mutableMapOf<Int, ToolCallBuilder>()
+        var inputTokens = 0
+        var outputTokens = 0
 
         SseUtil.streamSse(
             httpClient = httpClient,
@@ -100,6 +102,15 @@ class ClaudeProvider(
                 val type = event["type"]?.jsonPrimitive?.content
 
                 when (type) {
+                    "message_start" -> {
+                        val message = event["message"]?.jsonObject
+                        val usage = message?.get("usage")?.jsonObject
+                        inputTokens = usage?.get("input_tokens")?.jsonPrimitive?.content?.toIntOrNull() ?: 0
+                    }
+                    "message_delta" -> {
+                        val usage = event["usage"]?.jsonObject
+                        outputTokens = usage?.get("output_tokens")?.jsonPrimitive?.content?.toIntOrNull() ?: outputTokens
+                    }
                     "content_block_start" -> {
                         val index = event["index"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0
                         val block = event["content_block"]?.jsonObject
@@ -130,6 +141,15 @@ class ClaudeProvider(
                 }
             },
         )
+
+        // Emit token usage
+        if (inputTokens > 0 || outputTokens > 0) {
+            emit(LLMEvent.Usage(
+                promptTokens = inputTokens,
+                completionTokens = outputTokens,
+                totalTokens = inputTokens + outputTokens,
+            ))
+        }
 
         // Emit tool calls if any
         if (toolUseBlocks.isNotEmpty()) {

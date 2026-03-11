@@ -202,6 +202,7 @@ RIGHT: ask_user → "Do you have a specific image in mind, or should I help you 
 - Set task to "in_progress" before starting it, "completed" right after it succeeds, "failed" if it fails
 - If a step fails, update the task to "failed" and explain what went wrong
 - After ALL tasks are completed, you MUST call **confirm_completion** with a summary
+- **After the user confirms completion**, clean up ALL sub-tasks by calling update_task with status="deleted" for each one. This keeps the task list clean for subsequent operations.
 - Clean up stale tasks: if tasks from a previous conversation are irrelevant, delete them (status="deleted") before creating new ones
 
 ## Skill Reuse

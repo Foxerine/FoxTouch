@@ -28,6 +28,9 @@ interface SessionDao {
     @Query("DELETE FROM sessions WHERE id = :id")
     suspend fun deleteById(id: String)
 
+    @Query("UPDATE sessions SET lastTokenCount = :tokenCount WHERE id = :id")
+    suspend fun updateTokenCount(id: String, tokenCount: Int)
+
     @Query("DELETE FROM sessions WHERE id != :excludeId")
     suspend fun deleteAllExcept(excludeId: String)
 

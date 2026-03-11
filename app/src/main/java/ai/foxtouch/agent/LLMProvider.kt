@@ -52,6 +52,8 @@ data class ToolDefinition(
 sealed interface LLMEvent {
     data class TextDelta(val text: String) : LLMEvent
     data class ToolCallRequest(val calls: List<ToolCall>) : LLMEvent
+    /** Token usage reported by the API. Used for context compaction tracking. */
+    data class Usage(val promptTokens: Int, val completionTokens: Int, val totalTokens: Int) : LLMEvent
     data class Error(val message: String) : LLMEvent
     data object Done : LLMEvent
 }

@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ai.foxtouch.accessibility.AccessibilityBridge
 import ai.foxtouch.agent.AVAILABLE_PROVIDERS
+import ai.foxtouch.ui.components.BaseUrlTextField
 import ai.foxtouch.agent.ModelInfo
 import ai.foxtouch.agent.getDefaultModel
 import ai.foxtouch.ui.screens.settings.ModelListState
@@ -229,14 +230,10 @@ private fun ProviderConfigStep(
         // ── Optional ──
         SectionLabel("Optional")
 
-        OutlinedTextField(
+        BaseUrlTextField(
             value = baseUrl,
             onValueChange = { baseUrl = it },
-            label = { Text("Base URL") },
-            leadingIcon = { Icon(Icons.Default.Link, null) },
             placeholder = { Text("Leave empty to use official endpoint") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
         )
 
         Spacer(Modifier.height(12.dp))
@@ -300,7 +297,7 @@ private fun ModelSelectionStep(
         Spacer(Modifier.height(8.dp))
 
         Text(
-            text = "Choose the AI model to use. Models marked with * are recommended.",
+            text = "Choose the AI model to use.",
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -423,15 +420,10 @@ private fun SetupModelList(
             ListItem(
                 headlineContent = {
                     Text(
-                        text = m.displayName + when {
-                            m.recommended -> " *"
-                            m.warning != null -> " (!)"
-                            else -> ""
-                        },
+                        text = m.displayName + if (m.warning != null) " (!)" else "",
                         color = when {
                             isSelected -> MaterialTheme.colorScheme.primary
                             m.warning != null -> MaterialTheme.colorScheme.error
-                            m.recommended -> MaterialTheme.colorScheme.primary
                             else -> MaterialTheme.colorScheme.onSurface
                         },
                     )

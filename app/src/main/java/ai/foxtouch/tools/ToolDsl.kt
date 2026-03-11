@@ -1,6 +1,7 @@
 package ai.foxtouch.tools
 
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
@@ -59,6 +60,21 @@ class ToolParametersBuilder {
         if (required) requiredParams.add(name)
     }
 
+    fun objectArray(
+        name: String,
+        description: String,
+        required: Boolean = false,
+        init: ToolParametersBuilder.() -> Unit,
+    ) {
+        val itemSchema = ToolParametersBuilder().apply(init).build()
+        properties[name] = buildJsonObject {
+            put("type", "array")
+            put("items", itemSchema)
+            put("description", description)
+        }
+        if (required) requiredParams.add(name)
+    }
+
     fun build(): JsonObject = buildJsonObject {
         put("type", "object")
         put("properties", buildJsonObject {
@@ -83,31 +99,49 @@ val emptyParameters: JsonObject = buildJsonObject {
 }
 
 // ── Argument extraction helpers ─────────────────────────────────────
+// All helpers skip JSON `null` values (sent by OpenAI models for nullable
+// optional params) so that they're treated the same as absent.
 
-/** Extract a required string parameter, or return an error message. */
-fun JsonObject.requireString(key: String): String? =
-    this[key]?.jsonPrimitive?.content
+/** Get the string content of a JsonElement, or null if the element is JsonNull. */
+private fun JsonObject.primitiveOrNull(key: String): String? {
+    val element = this[key] ?: return null
+    if (element is JsonNull) return null
+    return element.jsonPrimitive.content
+}
+
+/** Extract a required string parameter, or return null if missing/null. */
+fun JsonObject.requireString(key: String): String? = primitiveOrNull(key)
 
 /** Extract a required int parameter, or return null. */
-fun JsonObject.requireInt(key: String): Int? =
-    this[key]?.jsonPrimitive?.content?.toIntOrNull()
+fun JsonObject.requireInt(key: String): Int? = primitiveOrNull(key)?.toIntOrNull()
 
 /** Extract an optional int parameter with a default. */
 fun JsonObject.optionalInt(key: String, default: Int): Int =
-    this[key]?.jsonPrimitive?.content?.toIntOrNull() ?: default
+    primitiveOrNull(key)?.toIntOrNull() ?: default
 
 /** Extract an optional long parameter with a default. */
 fun JsonObject.optionalLong(key: String, default: Long): Long =
-    this[key]?.jsonPrimitive?.content?.toLongOrNull() ?: default
+    primitiveOrNull(key)?.toLongOrNull() ?: default
 
 /** Extract a required float parameter, or return null. */
-fun JsonObject.requireFloat(key: String): Float? =
-    this[key]?.jsonPrimitive?.content?.toFloatOrNull()
+fun JsonObject.requireFloat(key: String): Float? = primitiveOrNull(key)?.toFloatOrNull()
 
 /** Extract an optional boolean parameter with a default. */
 fun JsonObject.optionalBoolean(key: String, default: Boolean): Boolean =
-    this[key]?.jsonPrimitive?.content?.toBooleanStrictOrNull() ?: default
+    primitiveOrNull(key)?.toBooleanStrictOrNull() ?: default
 
 /** Extract an optional string array parameter. */
-fun JsonObject.optionalStringArray(key: String): List<String> =
-    (this[key] as? JsonArray)?.mapNotNull { it.jsonPrimitive.content } ?: emptyList()
+fun JsonObject.optionalStringArray(key: String): List<String> {
+    val element = this[key] ?: return emptyList()
+    if (element is JsonNull) return emptyList()
+    return (element as? JsonArray)?.mapNotNull {
+        if (it is JsonNull) null else it.jsonPrimitive.content
+    } ?: emptyList()
+}
+
+/** Extract an optional array of JSON objects. */
+fun JsonObject.optionalObjectArray(key: String): List<JsonObject> {
+    val element = this[key] ?: return emptyList()
+    if (element is JsonNull) return emptyList()
+    return (element as? JsonArray)?.filterIsInstance<JsonObject>() ?: emptyList()
+}
