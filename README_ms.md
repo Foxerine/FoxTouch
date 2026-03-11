@@ -104,6 +104,85 @@ FoxTouch ialah ejen telefon berkuasa AI untuk Android, diilhamkan oleh [Claude C
 - **Perlindungan keselamatan** — kelulusan setiap alat, kebenaran tahap risiko, togol mod YOLO
 - **UI pelbagai bahasa** — English, 简体中文, 繁體中文, 日本語, 한국어, Español, Bahasa Melayu
 
+### Reka Bentuk Terperinci
+
+<details>
+<summary><b>Pemampatan Konteks Automatik</b> — Ringkasan perbualan tanpa gangguan apabila menghampiri had token</summary>
+
+Apabila tugasan panjang memenuhi tetingkap konteks LLM, FoxTouch memampatkan perbualan secara automatik dan bukannya gagal atau kehilangan konteks.
+
+**Ambang bertingkat** — Tetingkap konteks yang lebih kecil dimampatkan lebih awal (70% untuk ≤128K); tetingkap lebih besar boleh diisi lebih banyak (85% untuk >500K). Pangkalan data terbina dalam 100+ model dengan penemuan API masa jalan.
+
+**Ringkasan pintar** — Prompt pemampatan menuntut pemeliharaan butiran yang boleh diambil tindakan: mesej pengguna asal, ID elemen, koordinat, nama pakej, laluan ralat dan "langkah seterusnya" yang konkrit.
+
+**Kesinambungan lancar** — Selepas meringkaskan, bersihkan sejarah, suntik semula prompt sistem dengan konteks peranti terkini, dan tambahkan ringkasan sebagai mesej pengguna dengan arahan "teruskan seolah-olah gangguan tidak pernah berlaku".
+
+</details>
+
+<details>
+<summary><b>Sistem Anotasi Tangkapan Skrin</b> — Empat lapisan visual bebas untuk penaakulan ruang LLM</summary>
+
+Ejen boleh meminta sehingga empat lapisan anotasi pada tangkapan skrin:
+
+1. **Grid koordinat** — Garisan setiap 200px sebagai rujukan ruang
+2. **Sempadan elemen** — Segi empat berwarna: hijau=boleh klik, biru=boleh tatal, oren=boleh edit, kelabu=lain
+3. **Label teks/kelas** — Nama kelas dan kandungan teks elemen
+4. **Penanda klik** — Pengesahan selepas tindakan menunjukkan kedudukan ketikan tepat
+
+</details>
+
+<details>
+<summary><b>Abstraksi LLM Pelbagai Penyedia</b> — Satu antara muka, tiga API yang berbeza</summary>
+
+Semua penyedia mengeluarkan `Flow<LLMEvent>` bersatu, tetapi mengendalikan perbezaan API secara dalaman:
+
+- **Claude** — Penstriman SSE asli Anthropic. Penormalan peranan mesej dan penggabungan mesej berturut-turut. Sokongan pemikiran lanjutan.
+
+- **Gemini** — Memaksa mod bukan penstriman apabila alat hadir. Tandatangan mesti dikembalikan dalam mesej seterusnya.
+
+- **OpenAI** — Mengubah sifat pilihan kepada jenis nullable dan menjadikan semua sifat wajib.
+
+</details>
+
+<details>
+<summary><b>Input Teks 3 Peringkat</b> — Sandaran bertingkat untuk keserasian input teks universal</summary>
+
+1. **IME terbina dalam** (FoxTouchIME) — InputMethodService tidak kelihatan. Paling dipercayai untuk WebView, Flutter dan kawalan tersuai. **Dikecualikan daripada sekatan baca papan keratan Android 10+**.
+
+2. **ACTION_SET_TEXT** — Tindakan kebolehcapaian standard pada nod fokus.
+
+3. **Tampal papan keratan** — Pilihan terakhir: tulis ke papan keratan dan hantar `ACTION_PASTE`.
+
+</details>
+
+<details>
+<summary><b>Sistem Keselamatan & Kebenaran</b> — Tahap risiko berperingkat dengan penukaran mod masa jalan</summary>
+
+Setiap alat mengisytiharkan tahap risiko (rendah/sederhana/tinggi). Pengguna boleh membalas permintaan kelulusan dengan: Benarkan, Sentiasa Benarkan, Benarkan Semua (mod YOLO untuk pusingan semasa sahaja) atau Tolak.
+
+</details>
+
+<details>
+<summary><b>Mod Rancangan</b> — Fasa pemerhatian terhad sebelum pelaksanaan</summary>
+
+Dalam tugasan kompleks, ejen memasuki mod rancangan di mana hanya alat baca sahaja dan alat perancangan boleh digunakan. Pelan berstruktur dicipta untuk semakan pengguna; alat interaksi hanya dibuka kunci selepas kelulusan.
+
+</details>
+
+<details>
+<summary><b>Seni Bina Tindanan</b> — Jetpack Compose dirender dalam perkhidmatan tindanan sistem</summary>
+
+Panel terapung adalah `ComposeView` + `TYPE_APPLICATION_OVERLAY`, dirender dengan `LifecycleOwner` tersuai. Menukar mod fokus secara dinamik mengikut keadaan ejen. Menyembunyikan tindanan sebelum setiap tangkapan skrin dan menunggu 50ms untuk bingkai bersih.
+
+</details>
+
+<details>
+<summary><b>Akses Papan Keratan</b> — Pintasan 3 peringkat sekatan papan keratan Android</summary>
+
+Terhadap sekatan baca papan keratan Android 10+: laluan IME (dikecualikan) → konteks perkhidmatan kebolehcapaian → Activity telus (mendapat fokus tetingkap sementara, selesai dalam 2 saat).
+
+</details>
+
 ### Muat Turun
 
 APK release hanya **~9 MB** sahaja.

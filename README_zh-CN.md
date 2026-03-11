@@ -81,6 +81,120 @@ FoxTouch 是一个 AI 驱动的 Android 手机智能体，灵感来自 [Claude C
 - **安全防护** — 逐工具审批、风险等级权限、YOLO 模式切换
 - **多语言界面** — English、简体中文、繁體中文、日本語、한국어、Español、Bahasa Melayu
 
+### 设计详解
+
+<details>
+<summary><b>上下文自动压缩</b> — 接近 token 上限时无缝摘要对话</summary>
+
+当长任务填满 LLM 上下文窗口时，FoxTouch 自动压缩对话而非崩溃或丢失上下文。
+
+**分层阈值** — 较小的上下文窗口更早触发压缩（≤128K 时在 70%），留出更多空间；较大窗口可填充更多（>500K 时 85%）。内置 100+ 模型上下文大小数据库，支持运行时 API 发现覆盖。
+
+**智能摘要** — 压缩提示词要求保留可操作细节：逐字用户消息、元素 ID、坐标、包名、错误路径和具体的"下一步"。工具参数截断至 200 字符，结果截断至 300 字符以过滤噪音。
+
+**无缝续接** — 摘要后清除历史记录，重新注入带当前设备上下文的系统提示词，将摘要作为用户消息添加并指示"像中断从未发生一样继续"。循环在当前轮次内恢复，用户无感知。
+
+**独立压缩模型** — 可使用更便宜/更快的模型进行摘要（如用 Haiku 摘要、Opus 执行），降低长任务成本。
+
+</details>
+
+<details>
+<summary><b>截图标注系统</b> — 四层独立视觉标注辅助 LLM 空间推理</summary>
+
+智能体读取屏幕时，可在截图上请求最多四层标注：
+
+1. **坐标网格** — 每 200px 绘制参考线，提供绝对空间参考点
+2. **元素边界** — 彩色矩形框：绿色=可点击、蓝色=可滚动、橙色=可编辑、灰色=其他。每个标注 `[ID]`
+3. **文本/类标签** — 元素类名和文本内容显示在边界框下方
+4. **点击标记** — 操作后验证，精确显示点击位置
+
+所有坐标使用原始屏幕空间（非缩放位图空间）——转换在内部完成。LLM 在绝对坐标下推理，截图则被缩放以节省 token。
+
+**仅可点击过滤** — 可隐藏非交互元素，减少视觉噪音，帮助 LLM 专注于可操作的 UI。
+
+</details>
+
+<details>
+<summary><b>多提供商 LLM 抽象</b> — 一个接口，三种截然不同的 API</summary>
+
+所有提供商发出统一的 `Flow<LLMEvent>`（TextDelta、ToolCallRequest、Usage、Error、Done），但各自在内部处理显著的 API 差异：
+
+- **Claude** — 使用 Anthropic 原生 SSE 流（非 OpenAI 兼容）。规范化消息角色（工具结果变为用户消息），合并连续相同角色消息以满足 Claude 严格的交替要求。支持可配置预算的扩展思考。
+
+- **Gemini** — 存在工具时强制非流式，因为 Gemini 的 `thoughtSignature`（工具调用必需）在流式模式下不可靠。签名必须在后续消息中回显。思考块从输出中静默过滤。
+
+- **OpenAI** — 通过将可选属性转换为可空类型（`"type": "integer"` → `"type": ["integer", "null"]`）并使所有属性成为必需，解决 OpenAI 填充所有 schema 属性的问题。强制模型对未使用参数显式发送 `null` 而非猜测值。
+
+</details>
+
+<details>
+<summary><b>三级文本输入</b> — 级联回退实现通用文本输入兼容</summary>
+
+Android 上的文本输入出人意料地不可靠。不同应用处理方式不同，FoxTouch 实现了三级回退：
+
+1. **内置输入法**（FoxTouchIME）— 不可见的 InputMethodService，使用 `InputConnection.commitText()`。对 WebView、Flutter 应用和自定义控件最可靠。同时**豁免 Android 10+ 剪贴板读取限制**——这是它存在的关键原因。
+
+2. **ACTION_SET_TEXT** — 对焦点节点的标准无障碍操作。适用于大多数原生 Android 文本框，但对自定义渲染器失效。
+
+3. **剪贴板粘贴** — 最后手段：将文本写入剪贴板，然后通过无障碍分发 `ACTION_PASTE`。兼容性最广但会修改用户剪贴板。
+
+输入法自动切换：激活 FoxTouchIME → 提交文本 → `switchToPreviousInputMethod()` 恢复用户键盘——全程约 1.5 秒。
+
+</details>
+
+<details>
+<summary><b>安全与权限系统</b> — 分级风险等级与运行时模式切换</summary>
+
+每个工具声明风险等级：
+- **低风险**（自动批准）：read_screen、back、wait、记忆操作
+- **中风险**（每次询问）：clipboard、scroll、swipe、home
+- **高风险**（每次询问）：click、type_text、long_press、launch_app
+
+执行期间，用户可对审批请求回应：
+- **允许** — 批准此次调用
+- **始终允许** — 永久自动批准此工具
+- **全部允许** — 仅当前轮次进入 YOLO 模式（不持久化）
+- **拒绝** — 让智能体自行调整
+
+`confirm_completion` 工具确保智能体在认为任务完成前总是询问——对支付流程和不可逆操作至关重要。
+
+</details>
+
+<details>
+<summary><b>计划模式</b> — 执行前的受限观察阶段</summary>
+
+对于复杂的多步骤任务，智能体可进入计划模式：
+- 只能使用**只读工具**（read_screen、list_apps）和**计划工具**（edit_plan、create_task）
+- 不能执行任何状态改变操作（无点击、输入、滚动）
+- 将结构化计划写为 markdown 文件
+- 向用户展示计划以供审查
+
+用户可批准（普通或 YOLO 模式）、拒绝或要求修改。仅在批准后智能体才解锁交互工具开始执行。计划可保存为可复用技能。
+
+</details>
+
+<details>
+<summary><b>悬浮窗架构</b> — 系统叠加层服务中渲染 Jetpack Compose</summary>
+
+悬浮控制面板是添加到 `WindowManager` 的 `ComposeView`，使用 `TYPE_APPLICATION_OVERLAY`，由自定义 `LifecycleOwner` 渲染（因为 Service 默认缺乏生命周期支持）。
+
+**动态焦点** — 叠加层根据智能体状态切换可聚焦/不可聚焦。审批卡片时不可聚焦（仅显示信息）；用户提问时变为可聚焦并设置 `FLAG_NOT_TOUCH_MODAL`，使触摸事件穿透到底层应用。
+
+**叠加层隐藏** — 每次截图前，所有叠加层视图设为隐藏（`INVISIBLE`），等待 50ms 让合成器渲染干净帧，然后截图并恢复叠加层。防止智能体看到自己的 UI。
+
+</details>
+
+<details>
+<summary><b>剪贴板访问</b> — 三阶段绕过 Android 剪贴板限制</summary>
+
+Android 10+ 阻止应用在无窗口焦点时读取剪贴板。FoxTouch 使用三种回退策略：
+
+1. **输入法路径** — FoxTouchIME 豁免剪贴板限制（InputMethodService 始终可读取剪贴板）
+2. **无障碍服务上下文** — 通过无障碍服务直接访问 `ClipboardManager`
+3. **透明 Activity** — 启动不可见的 `ClipboardReaderActivity`，短暂获取窗口焦点读取剪贴板，通过 `CompletableDeferred` 返回结果——全程 2 秒内完成
+
+</details>
+
 ### 下载
 
 Release APK 仅约 **9 MB**。

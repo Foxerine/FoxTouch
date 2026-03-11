@@ -77,6 +77,91 @@ FoxTouch es un agente de teléfono impulsado por IA para Android, inspirado en [
 - **Protecciones de seguridad** — aprobación por herramienta, permisos por nivel de riesgo, modo YOLO
 - **Interfaz multilingüe** — English, 简体中文, 繁體中文, 日本語, 한국어, Español, Bahasa Melayu
 
+### Diseño en detalle
+
+<details>
+<summary><b>Auto-compactación de contexto</b> — Resumen automático de conversación al acercarse al límite de tokens</summary>
+
+Cuando una tarea larga llena la ventana de contexto del LLM, FoxTouch compacta automáticamente la conversación en lugar de fallar o perder contexto.
+
+**Umbrales escalonados** — Ventanas más pequeñas se compactan antes (70% para ≤128K); ventanas más grandes pueden llenarse más (85% para >500K). Base de datos interna de 100+ modelos con descubrimiento API en tiempo de ejecución.
+
+**Resumen inteligente** — El prompt de compactación exige preservar detalles accionables: mensajes del usuario literales, IDs de elementos, coordenadas, nombres de paquetes, rutas de error y el "siguiente paso" concreto.
+
+**Continuación sin interrupciones** — Tras resumir, limpia el historial, reinyecta el prompt del sistema con contexto actualizado del dispositivo, y añade el resumen como mensaje del usuario con instrucciones de "continuar como si la interrupción nunca hubiera ocurrido".
+
+**Modelo de compactación separado** — Puede usar un modelo más económico/rápido para resumir (ej: Haiku para resumir, Opus para ejecutar).
+
+</details>
+
+<details>
+<summary><b>Sistema de anotación de capturas</b> — Cuatro capas visuales independientes para razonamiento espacial del LLM</summary>
+
+Al leer la pantalla, el agente puede solicitar hasta cuatro capas de anotación:
+
+1. **Cuadrícula de coordenadas** — Líneas cada 200px como referencia espacial
+2. **Límites de elementos** — Rectángulos coloreados: verde=clicable, azul=desplazable, naranja=editable, gris=otro. Cada uno con `[ID]`
+3. **Etiquetas de texto/clase** — Nombre de clase y contenido de texto del elemento
+4. **Marcadores de clic** — Verificación post-acción mostrando exactamente dónde cayó el toque
+
+Todas las coordenadas usan el espacio de pantalla original — la conversión es interna.
+
+</details>
+
+<details>
+<summary><b>Abstracción multi-proveedor LLM</b> — Una interfaz, tres APIs muy diferentes</summary>
+
+Todos los proveedores emiten un `Flow<LLMEvent>` unificado, pero manejan internamente diferencias significativas:
+
+- **Claude** — Streaming SSE nativo de Anthropic. Normalización de roles de mensajes y fusión de mensajes consecutivos del mismo rol. Soporte de pensamiento extendido.
+
+- **Gemini** — Fuerza modo no-streaming con herramientas (el `thoughtSignature` es inestable en streaming). La firma debe devolverse en mensajes posteriores.
+
+- **OpenAI** — Transforma propiedades opcionales a tipos nullable y hace todas las propiedades obligatorias, forzando al modelo a enviar `null` explícito para parámetros no usados.
+
+</details>
+
+<details>
+<summary><b>Entrada de texto en 3 niveles</b> — Fallback en cascada para compatibilidad universal</summary>
+
+1. **IME integrado** (FoxTouchIME) — InputMethodService invisible. Más fiable para WebView, Flutter y controles personalizados. **Exento de restricciones de lectura del portapapeles de Android 10+**.
+
+2. **ACTION_SET_TEXT** — Acción de accesibilidad estándar en el nodo enfocado.
+
+3. **Pegado desde portapapeles** — Último recurso: escribe en el portapapeles y envía `ACTION_PASTE`.
+
+Cambio automático de IME: activar → enviar texto → restaurar teclado anterior, ~1.5 segundos.
+
+</details>
+
+<details>
+<summary><b>Sistema de seguridad y permisos</b> — Niveles de riesgo graduales con cambio de modo en tiempo de ejecución</summary>
+
+Cada herramienta declara un nivel de riesgo (bajo/medio/alto). El usuario puede responder a solicitudes de aprobación con: Permitir, Permitir siempre, Permitir todo (modo YOLO solo para el turno actual) o Denegar. `confirm_completion` garantiza que el agente siempre pregunte antes de completar.
+
+</details>
+
+<details>
+<summary><b>Modo plan</b> — Fase de observación restringida antes de la ejecución</summary>
+
+En tareas complejas, el agente entra en modo plan donde solo puede usar herramientas de lectura y planificación. Crea un plan estructurado para revisión del usuario; solo tras la aprobación se desbloquean las herramientas de interacción. Los planes pueden guardarse como habilidades reutilizables.
+
+</details>
+
+<details>
+<summary><b>Arquitectura de superposición</b> — Jetpack Compose renderizado en servicio de superposición del sistema</summary>
+
+El panel flotante es un `ComposeView` + `TYPE_APPLICATION_OVERLAY`, renderizado con un `LifecycleOwner` personalizado. Cambia dinámicamente entre modos enfocable/no-enfocable según el estado del agente. Antes de cada captura, oculta las superposiciones y espera 50ms para un frame limpio.
+
+</details>
+
+<details>
+<summary><b>Acceso al portapapeles</b> — Bypass en 3 etapas de las restricciones de Android</summary>
+
+Contra las restricciones de lectura de portapapeles de Android 10+: ruta IME (exento de restricciones) → contexto del servicio de accesibilidad → Activity transparente (obtiene foco de ventana temporalmente, completado en 2 segundos).
+
+</details>
+
 ### Descarga
 
 El APK de release ocupa solo **~9 MB**.

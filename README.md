@@ -81,6 +81,120 @@ An AI-powered phone agent for Android, inspired by [Claude Code](https://docs.an
 - **Safety guardrails** — per-tool approval, risk-level permissions, YOLO mode toggle
 - **Multi-language UI** — English, 简体中文, 繁體中文, 日本語, 한국어, Español, Bahasa Melayu
 
+### Design Deep Dive
+
+<details>
+<summary><b>Context Auto-Compaction</b> — Seamless conversation summarization when approaching token limits</summary>
+
+When a long-running task fills up the LLM's context window, FoxTouch automatically compacts the conversation instead of crashing or losing context.
+
+**Tiered thresholds** — Smaller context windows compact earlier (70% for ≤128K) to leave more headroom; larger windows can fill more (85% for >500K). This is calculated per-model using a built-in database of 100+ model context sizes with runtime API discovery as override.
+
+**Smart summarization** — The compaction prompt demands preservation of actionable details: verbatim user messages, element IDs, coordinates, package names, error paths, and a concrete "next step". Tool arguments are truncated to 200 chars and results to 300 chars to avoid feeding noise to the summarizer.
+
+**Seamless continuation** — After summarizing, the system clears history, re-injects a fresh system prompt with current device context, and adds the summary as a user message with instructions like "continue as if the break never happened". The loop resumes in-turn without the user noticing.
+
+**Separate compact model** — Can use a cheaper/faster model for summarization (e.g., Haiku to summarize, Opus to execute), reducing cost on long tasks.
+
+</details>
+
+<details>
+<summary><b>Screenshot Annotation System</b> — Four independent visual layers for LLM spatial reasoning</summary>
+
+When the agent reads the screen, it can request up to four annotation layers on the screenshot:
+
+1. **Coordinate grid** — Lines every 200px providing absolute spatial reference points
+2. **Element boundaries** — Color-coded rectangles: green=clickable, blue=scrollable, orange=editable, gray=other. Each labeled with `[ID]`
+3. **Text/class labels** — Element class names and text content displayed below each boundary
+4. **Click markers** — Post-action verification showing exactly where a tap landed
+
+All coordinates use original screen space (not scaled bitmap space) — conversion happens internally. The LLM reasons about absolute coordinates while screenshots are scaled down for token efficiency.
+
+**Clickable-only filter** — Option to hide non-interactive elements, reducing visual noise and helping the LLM focus on actionable UI.
+
+</details>
+
+<details>
+<summary><b>Multi-Provider LLM Abstraction</b> — One interface, three very different APIs</summary>
+
+All providers emit a unified `Flow<LLMEvent>` (TextDelta, ToolCallRequest, Usage, Error, Done), but each handles significant API differences internally:
+
+- **Claude** — Uses Anthropic's native SSE streaming (not OpenAI-compatible). Normalizes message roles (tool results become user messages) and merges consecutive same-role messages to satisfy Claude's strict alternation requirement. Supports extended thinking with configurable budget.
+
+- **Gemini** — Forces non-streaming when tools are present because Gemini's `thoughtSignature` (required for tool calls) is unreliable in streaming mode. The signature must be echoed back in subsequent messages. Thinking blocks are silently filtered from output.
+
+- **OpenAI** — Solves OpenAI's tendency to fill ALL schema properties by transforming optional properties into nullable types (`"type": "integer"` → `"type": ["integer", "null"]`) and making every property required. This forces the model to explicitly send `null` for unused parameters instead of guessing values.
+
+</details>
+
+<details>
+<summary><b>Three-Tier Text Input</b> — Cascading fallback for universal text input compatibility</summary>
+
+Text input on Android is surprisingly unreliable. Different apps handle it differently, so FoxTouch implements a three-tier fallback:
+
+1. **Built-in IME** (FoxTouchIME) — An invisible InputMethodService that uses `InputConnection.commitText()`. Most reliable for WebViews, Flutter apps, and custom controls. Also **exempt from Android 10+ clipboard read restrictions** — a key reason for its existence.
+
+2. **ACTION_SET_TEXT** — Standard accessibility action on the focused node. Works for most native Android text fields but fails on custom renderers.
+
+3. **Clipboard paste** — Last resort: writes text to clipboard, then dispatches `ACTION_PASTE` via accessibility. Most universally compatible but modifies the user's clipboard.
+
+The IME auto-switches: activates FoxTouchIME, commits text, then `switchToPreviousInputMethod()` to restore the user's keyboard — all within ~1.5 seconds.
+
+</details>
+
+<details>
+<summary><b>Safety & Permission System</b> — Graduated risk levels with runtime mode switching</summary>
+
+Every tool declares a risk level:
+- **LOW** (auto-approved): read_screen, back, wait, memory operations
+- **MEDIUM** (ask each time): clipboard, scroll, swipe, home
+- **HIGH** (ask each time): click, type_text, long_press, launch_app
+
+During execution, the user can respond to approval requests with:
+- **Allow** — approve this one call
+- **Always Allow** — permanently auto-approve this tool
+- **Allow All** — enter YOLO mode for the current turn only (not persisted)
+- **Deny** — reject and let the agent adapt
+
+The `confirm_completion` tool ensures the agent always asks before considering a task done — critical for payment flows and irreversible actions.
+
+</details>
+
+<details>
+<summary><b>Plan Mode</b> — Restricted observation phase before execution</summary>
+
+For complex multi-step tasks, the agent can enter plan mode where it:
+- Can only use **read-only tools** (read_screen, list_apps) and **planning tools** (edit_plan, create_task)
+- Cannot perform any state-changing actions (no clicks, typing, scrolling)
+- Writes a structured plan as a markdown file
+- Presents the plan to the user for review
+
+The user can approve (normal or YOLO mode), reject, or request modifications. Only after approval does the agent unlock interaction tools and begin execution. Plans can be saved as reusable skills.
+
+</details>
+
+<details>
+<summary><b>Overlay Architecture</b> — Jetpack Compose rendered in a system overlay service</summary>
+
+The floating control panel is a `ComposeView` added to `WindowManager` with `TYPE_APPLICATION_OVERLAY`, rendered by a custom `LifecycleOwner` (since services lack lifecycle support by default).
+
+**Dynamic focusability** — The overlay switches between focusable/non-focusable states based on agent state. During approval cards it's non-focusable (shows info only); during user questions it becomes focusable with `FLAG_NOT_TOUCH_MODAL` so touches pass through to the app underneath.
+
+**Overlay hiding** — Before every screenshot capture, all overlay views are hidden (`INVISIBLE`), a 50ms frame settle delay ensures the compositor renders a clean frame, then the screenshot is taken and overlays are restored. This prevents the agent from seeing its own UI.
+
+</details>
+
+<details>
+<summary><b>Clipboard Access</b> — Three-stage bypass for Android's clipboard restrictions</summary>
+
+Android 10+ blocks clipboard reads unless an app has window focus. FoxTouch uses three fallback strategies:
+
+1. **IME path** — FoxTouchIME is exempt from clipboard restrictions (InputMethodServices can always read clipboard)
+2. **Accessibility service context** — Direct `ClipboardManager` access from the accessibility service
+3. **Transparent activity** — Launches an invisible `ClipboardReaderActivity` that briefly gains window focus, reads the clipboard, and returns the result via `CompletableDeferred` — all within 2 seconds
+
+</details>
+
 ### Supported LLM Providers
 
 | Provider | Models | Streaming | Vision | Extended Thinking |
